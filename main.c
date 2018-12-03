@@ -1,79 +1,102 @@
-/*Created: 16.11.2018
-Creator: Alexander
-last edit: 16.11.2018
-last editor: Alexander
-*/
- 
 #define GAMEKINDNAME "Checkers"
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 #define PORTNUMBER 1357
 #define BUF 256
 #define INT_MAX 2147483647
 
+//Bibliotheken einbinden
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/ipc.h>
 
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<"performConnection">
-
-
-
-void printHilfe() {
-		printf("Fehlende Parameter\nBitte erneut eingeben mit Parameter");
-		printf("Parameter -g für GameId -p für SpielerNummer (nur 1 oder 2 moeglich)\n");
-}	
-
-
-int main(int argc,char argv){
+//weitere Programmteile einbinden
+#include "performConnection.c"
 
 
 
-char gid[13]; //Game-ID
-int player = INT_MAX; //Player-ID
+void printHilfe(){
+		printf("Programmaufruf nur mit: -g <gameId> -p <{1,2}>\n");
+}
+
+
+int main(int argc,char** argv){
+
+
+
+  char gid[13]; //Game-ID
+  int player;// = INT_MAX; //Player-ID
 
   // Kommandozeilenparameter einlesen
   int ret;
-  while ((ret=getopt(argc, argv, "g:p")) != -1) {
+  int gFlag = 0;
+  int pFlag = 0;
+  while ((ret=getopt(argc, argv, "g:p:")) != -1) {
     switch (ret) {
       case 'g':
-	 strcpy(gid, optarg);
-         break;
+        if(gFlag == 0){
+          strcpy(gid, optarg);
+          gFlag++;
+        } else {
+          printHilfe();
+          return -1;
+        }
+        break;
       case 'p':
-         player = optarg;
-	if(player == 1 || player == 2)
-		break;	
-	else
+        if(pFlag == 0 && (atoi(optarg) == 1 || atoi(optarg) == 2)){
+          player = atoi(optarg);
+          pFlag++;
+        } else {
+          printHilfe();
+          return -1;
+        }
+        break;
       default:
         printHilfe();
-	
-	printf("Bitte tätigen sie ihre Eingabe:\n");
-        break;	
+	return -1;
     }
   }
+  if (pFlag == 0 || gFlag == 0){
+    printHilfe();
+    return -1;
+  }
 
+  //Erstellen der Pipe
+	int fd[2];
+	if (pipe(fd) < 0) {
+		printf("Fehler beim Erstellen der pipe\n");
+		exit(EXIT_FAILURE);
+	}
 
-//Wenn das Programm ohne Argumente gestertet wird startet es erneut und bittet um die Parameter
-	if (argc < 2) {
-		printf("Fehlende Parameter\nBitte erneut eingeben mit Parameter");
-		printf("Parameter -g für GameId -p für SpielerNummer (nur 1 oder 2 moeglich)\n");
+	pid_t pid = fork();
+	if (pid<0) {
+		printf("Fehler beim Gabeln der Prozesse\n");
+		exit(EXIT_FAILURE);
+	} else
+	if (pid==0) {
+		//Hier beginnt der Connector = Kindprozess
+
+		//Schließen der Schreibseite
+		close(fd[1]);
+		//printf("Hallo ich bin der Kindprozess, der Connector\n");
+
+		//Herstellen der Verbindung zum Server und Kommunikation mit diesem
+		performConnection();
+		close(fd[0]);
+	} else {
+		//Hier beginnt der Thinker = ElternProzess
+
+		//Schließen der Leseseite
+		close(fd[0]);
+		//printf("Hallo ich bin der ElternProzess, der Thinker\n");
+		//think();
+		close(fd[1]);
 
 	}
 
-	
 
-	// Socket vorbereiten
-	struct sockaddr_in address;
-	int sock = socket(PF_INET,SOCK_STREAM,0);
-	int new_socket;     
-	address.sin_family = AF_INET;
-	address.sin_port = htons(PORTNUMBER);
-
-
-	performConnection(address);
-
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
-
