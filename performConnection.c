@@ -98,26 +98,29 @@ int performConnection(){
     printf("Could not connect to server\n");
   }
 
-
   //Kommunikation mit Server
   char buffer[BUF];
-  recv(sock, &buffer, sizeof(buffer), 0);
-  printf("%s\n", buffer);
-
+  read(sock, buffer, BUF);
+  printf("%s", buffer);
 
 
   strcpy(buffer, "VERSION 2.0\n");
-  send(sock, buffer, sizeof(buffer), 0);
+  write(sock, buffer, sizeof(char)*12);
+  printf("%s", buffer);
+
+
+  read(sock, buffer, BUF);
+  printf("%s", buffer);
+
+
+  strcpy(buffer, "ID 3ir44rz0u65kj\n");
+  write(sock, buffer, sizeof(char)*17);
   printf("%s\n", buffer);
 
-  recv(sock, &buffer, sizeof(buffer), 0);
-  printf("%s\n", buffer);
 
-  strcpy(buffer, "ID 2pg1pfbgr8l2g\n");
-  send(sock, buffer, sizeof(buffer),0);
+  read(sock, buffer, BUF);
   printf("%s\n", buffer);
-
-  recv(sock, &buffer, sizeof(buffer), 0);
+  read(sock, buffer, BUF);
   printf("%s\n", buffer);
 
   //close connection
