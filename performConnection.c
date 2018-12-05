@@ -68,7 +68,18 @@ int readServer(int *socket, char *buffer){
   memset(buffer, 0, BUF);
 
   if(read(*socket, buffer, BUF) != 0){
-  printf("Server: %s\n", buffer);
+  printf("Server: %s", buffer);
+  return 0;
+  }
+  return -1;
+}
+
+int writeServer(int *socket, char *buffer, char message[BUF]){
+
+  strcpy(buffer, message);
+
+  if(write(*socket, buffer, strlen(buffer)) != 0){
+  printf("Client: %s", buffer);
   return 0;
   }
   return -1;
@@ -110,24 +121,30 @@ int performConnection(){
   readServer(&sock, buffer);
 
 
-  strcpy(buffer, "VERSION 2.0\n");
-  write(sock, buffer, strlen(buffer));
-  printf("%s", buffer);
+  //send Client Version
+  writeServer(&sock, buffer, "VERSION 2.0\n");
 
 
-  //Version accepted, request GAME ID
+  //Version accepted, request gameID
   readServer(&sock, buffer);
 
-
-  strcpy(buffer, "ID 3ir44rz0u65kj\n");
-  write(sock, buffer, strlen(buffer));
-  printf("%s\n", buffer);
+  //send gameID
+  writeServer(&sock, buffer, "ID 0ektro7lgln9t\n");
 
 
   //Playing Checkers
   readServer(&sock, buffer);
 
   //Game Name
+  readServer(&sock, buffer);
+
+  //gewünschte Mitsplielernummer
+  writeServer(&sock, buffer, "PLAYER 2\n");
+
+  //Mitspielerantwort
+  readServer(&sock, buffer);
+
+  //Alle Mitspieler
   readServer(&sock, buffer);
 
   //close connection
