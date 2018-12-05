@@ -28,17 +28,12 @@ int hostname_to_ip(char* host, char *ip){
     return 1;
   }
 
-  printf("getaddrinfo\n");
-
-
   //take the first possible result
   for(p = servinfo; p != NULL; p = p->ai_next){
     h = (struct sockaddr_in *) p->ai_addr;
     strcpy(ip, inet_ntoa(h->sin_addr));
     printf("%s\n", inet_ntoa(h->sin_addr));
   }
-  printf("got the result.\n");
-
 
   freeaddrinfo(servinfo);
   return 0;
@@ -68,9 +63,19 @@ int hostname_to_ip(char * hostname, char* ip){
 }
 */
 
-int performConnection(){
+int readServer(int *socket, char *buffer){
 
-  printf("performConnection start\n");
+  memset(buffer, 0, BUF);
+
+  if(read(*socket, buffer, BUF) != 0){
+  printf("Server: %s\n", buffer);
+  return 0;
+  }
+  return -1;
+}
+
+
+int performConnection(){
 
   //get ip
   char * ip;
@@ -100,33 +105,34 @@ int performConnection(){
 
   //Kommunikation mit Server
   char buffer[BUF];
-  read(sock, buffer, BUF);
-  printf("%s", buffer);
+
+  //get Server version
+  readServer(&sock, buffer);
 
 
   strcpy(buffer, "VERSION 2.0\n");
-  write(sock, buffer, sizeof(char)*12);
+  write(sock, buffer, strlen(buffer));
   printf("%s", buffer);
 
 
-  read(sock, buffer, BUF);
-  printf("%s", buffer);
+  //Version accepted, request GAME ID
+  readServer(&sock, buffer);
 
 
   strcpy(buffer, "ID 3ir44rz0u65kj\n");
-  write(sock, buffer, sizeof(char)*17);
+  write(sock, buffer, strlen(buffer));
   printf("%s\n", buffer);
 
 
-  read(sock, buffer, BUF);
-  printf("%s\n", buffer);
-  read(sock, buffer, BUF);
-  printf("%s\n", buffer);
+  //Playing Checkers
+  readServer(&sock, buffer);
+
+  //Game Name
+  readServer(&sock, buffer);
 
   //close connection
   close(sock);
 
-  printf("I made it all the way\n");
   return 0;
 }
 
