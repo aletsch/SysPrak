@@ -32,7 +32,6 @@ int hostname_to_ip(char* host, char *ip){
   for(p = servinfo; p != NULL; p = p->ai_next){
     h = (struct sockaddr_in *) p->ai_addr;
     strcpy(ip, inet_ntoa(h->sin_addr));
-    printf("%s\n", inet_ntoa(h->sin_addr));
   }
 
   freeaddrinfo(servinfo);
@@ -96,7 +95,6 @@ int performConnection(){
     exit(EXIT_FAILURE);
   }
 
-  printf("Die ip ist:%s\n", ip);
   //create a socket
   int sock;
   sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -106,8 +104,6 @@ int performConnection(){
   server_address.sin_family = AF_INET;
   server_address.sin_port = htons(PORTNUMBER);
   server_address.sin_addr.s_addr = inet_addr(ip);
-
-  printf("Struktur erstellt: %i\n",server_address.sin_addr.s_addr);
 
   int connection_status = connect(sock, (struct sockaddr *) &server_address, sizeof(server_address));
   if (connection_status != 0){
