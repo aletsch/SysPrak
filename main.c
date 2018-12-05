@@ -19,7 +19,7 @@
 
 
 void printHilfe(){
-		printf("Programmaufruf nur mit: -g <gameId> -p <{1,2}>\n");
+		printf("Programmaufruf nur mit: -g <gameId> -p <{0,1}>\n");
 }
 
 
@@ -28,7 +28,7 @@ int main(int argc,char** argv){
 
 
   char gid[13]; //Game-ID
-  int player;// = INT_MAX; //Player-ID
+  char player[2];//Player-ID
 
   // Kommandozeilenparameter einlesen
   int ret;
@@ -46,8 +46,8 @@ int main(int argc,char** argv){
         }
         break;
       case 'p':
-        if(pFlag == 0 && (atoi(optarg) == 1 || atoi(optarg) == 2)){
-          player = atoi(optarg);
+        if(pFlag == 0 && (atoi(optarg) == 1 || atoi(optarg) == 0)){
+          strcpy(player, optarg);
           pFlag++;
         } else {
           printHilfe();
@@ -84,18 +84,20 @@ int main(int argc,char** argv){
 		//printf("Hallo ich bin der Kindprozess, der Connector\n");
 
 		//Herstellen der Verbindung zum Server und Kommunikation mit diesem
-		performConnection();
-		close(fd[0]);
-	} else {
-		//Hier beginnt der Thinker = ElternProzess
+    printf("gameID %s\nSpieler %s\n", gid, player);
+    performConnection(gid, player);
 
-		//Schließen der Leseseite
-		close(fd[0]);
-		//printf("Hallo ich bin der ElternProzess, der Thinker\n");
-		//think();
-		close(fd[1]);
+    close(fd[0]);
+  } else {
+    //Hier beginnt der Thinker = ElternProzess
 
-	}
+    //Schließen der Leseseite
+    close(fd[0]);
+    //printf("Hallo ich bin der ElternProzess, der Thinker\n");
+    //think();
+    close(fd[1]);
+
+  }
 
 
   return EXIT_SUCCESS;

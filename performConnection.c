@@ -85,7 +85,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
 }
 
 
-int performConnection(){
+int performConnection(char* gameID, char* player){
 
   //get ip
   char * ip;
@@ -125,7 +125,12 @@ int performConnection(){
   readServer(&sock, buffer);
 
   //send gameID
-  writeServer(&sock, buffer, "ID 0ektro7lgln9t\n");
+  char* temp = malloc(sizeof(char)*17);
+  strcpy(temp, "ID ");
+  strcat(temp, gameID);
+  strcat(temp, "\n");
+  writeServer(&sock, buffer, temp);
+
 
 
   //Playing Checkers
@@ -135,7 +140,11 @@ int performConnection(){
   readServer(&sock, buffer);
 
   //gewünschte Mitsplielernummer
-  writeServer(&sock, buffer, "PLAYER 2\n");
+  strcpy(temp, "PLAYER ");
+  strcat(temp, player);
+  strcat(temp, "\n");
+  writeServer(&sock, buffer, temp);
+  free(temp);
 
   //Mitspielerantwort
   readServer(&sock, buffer);
