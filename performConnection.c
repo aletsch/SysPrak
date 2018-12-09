@@ -84,20 +84,16 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
   return -1;
 }
 
-
-int performConnection(char* gameID, char* player){
-
+int connectToServer(int* sock){
   //get ip
-  char * ip;
-  ip=(char *)malloc(60*sizeof(char));
+  char *ip;
+  ip = (char *)malloc(60*sizeof(char));
   char *hostname = HOSTNAME;
   if (hostname_to_ip(hostname, ip) == 1){
     exit(EXIT_FAILURE);
   }
 
-  //create a socket
-  int sock;
-  sock = socket(AF_INET, SOCK_STREAM, 0);
+
 
   // address structure to connect to
   struct sockaddr_in server_address;
@@ -105,55 +101,61 @@ int performConnection(char* gameID, char* player){
   server_address.sin_port = htons(PORTNUMBER);
   server_address.sin_addr.s_addr = inet_addr(ip);
 
-  int connection_status = connect(sock, (struct sockaddr *) &server_address, sizeof(server_address));
+  int connection_status = connect(*sock, (struct sockaddr *) &server_address, sizeof(server_address));
   if (connection_status != 0){
     printf("Could not connect to server\n");
+    return -1;
   }
+
+  return 0;
+}
+
+int performConnection(char* gameID, char* player, int* sock){
+
+
 
   //Kommunikation mit Server
   char buffer[BUF];
 
   //get Server version
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
 
   //send Client Version
-  writeServer(&sock, buffer, "VERSION 2.0\n");
+  writeServer(sock, buffer, "VERSION 2.0\n");
 
 
   //Version accepted, request gameID
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
   //send gameID
   char* temp = malloc(sizeof(char)*17);
   strcpy(temp, "ID ");
   strcat(temp, gameID);
   strcat(temp, "\n");
-  writeServer(&sock, buffer, temp);
+  writeServer(sock, buffer, temp);
 
 
 
   //Playing Checkers
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
   //Game Name
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
   //gewünschte Mitsplielernummer
   strcpy(temp, "PLAYER ");
-  strcat(temp, player);
+  //strcat(temp, player);
   strcat(temp, "\n");
-  writeServer(&sock, buffer, temp);
+  writeServer(sock, buffer, temp);
   free(temp);
 
   //Mitspielerantwort
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
   //Alle Mitspieler
-  readServer(&sock, buffer);
+  readServer(sock, buffer);
 
-  //close connection
-  close(sock);
 
   return 0;
 }

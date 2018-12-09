@@ -64,6 +64,17 @@ int main(int argc,char** argv){
     return -1;
   }
 
+  //create a socket and connect to server
+  int *sock;
+  sock = (int *)malloc(4*sizeof(int));
+  *sock = socket(AF_INET, SOCK_STREAM, 0);
+  connectToServer(sock);
+  printf("gameID %s\nSpieler %s\n", gid, player);
+  performConnection(gid, player, sock);
+
+  //close connection
+  close(*sock);
+
   //Erstellen der Pipe
 	int fd[2];
 	if (pipe(fd) < 0) {
@@ -82,10 +93,7 @@ int main(int argc,char** argv){
 		//Schließen der Schreibseite
 		close(fd[1]);
 		//printf("Hallo ich bin der Kindprozess, der Connector\n");
-
-		//Herstellen der Verbindung zum Server und Kommunikation mit diesem
-    printf("gameID %s\nSpieler %s\n", gid, player);
-    performConnection(gid, player);
+    
 
     close(fd[0]);
   } else {
