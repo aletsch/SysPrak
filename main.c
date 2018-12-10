@@ -29,12 +29,13 @@ int main(int argc,char** argv){
 
   char gid[13]; //Game-ID
   char player[2];//Player-ID
+  char config[64] = "client.conf";
 
   // Kommandozeilenparameter einlesen
   int ret;
   int gFlag = 0;
   int pFlag = 0;
-  while ((ret=getopt(argc, argv, "g:p:")) != -1) {
+  while ((ret=getopt(argc, argv, "g:p:c:")) != -1) {
     switch (ret) {
       case 'g':
         if(gFlag == 0){
@@ -53,6 +54,9 @@ int main(int argc,char** argv){
           printHilfe();
           return -1;
         }
+        break;
+      case 'c':
+        strcpy(config, optarg);
         break;
       default:
         printHilfe();
