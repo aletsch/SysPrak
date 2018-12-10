@@ -9,8 +9,8 @@
 #include <arpa/inet.h>
 
 
-#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
-#define PORTNUMBER 1357
+//#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de\n"
+//#define PORTNUMBER 1357
 #define BUF 256
 
 
@@ -84,11 +84,11 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
   return -1;
 }
 
-int connectToServer(int* sock){
+int connectToServer(int* sock, char* host, int port){
   //get ip
   char *ip;
   ip = (char *)malloc(60*sizeof(char));
-  char *hostname = HOSTNAME;
+  char *hostname = host;
   if (hostname_to_ip(hostname, ip) == 1){
     exit(EXIT_FAILURE);
   }
@@ -98,7 +98,7 @@ int connectToServer(int* sock){
   // address structure to connect to
   struct sockaddr_in server_address;
   server_address.sin_family = AF_INET;
-  server_address.sin_port = htons(PORTNUMBER);
+  server_address.sin_port = htons(port);
   server_address.sin_addr.s_addr = inet_addr(ip);
 
   int connection_status = connect(*sock, (struct sockaddr *) &server_address, sizeof(server_address));
@@ -111,8 +111,6 @@ int connectToServer(int* sock){
 }
 
 int performConnection(char* gameID, char* player, int* sock){
-
-
 
   //Kommunikation mit Server
   char buffer[BUF];

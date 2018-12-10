@@ -1,8 +1,6 @@
-#define GAMEKINDNAME "Checkers"
-#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
-#define PORTNUMBER 1357
-#define BUF 256
-#define INT_MAX 2147483647
+//#define GAMEKINDNAME "Checkers"
+//#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
+//#define PORTNUMBER 1357
 
 //Bibliotheken einbinden
 #include <stdio.h>
@@ -15,6 +13,7 @@
 
 //weitere Programmteile einbinden
 #include "performConnection.c"
+#include "conf.c"
 
 
 
@@ -27,7 +26,7 @@ int main(int argc,char** argv){
 
 
 
-  char gid[13]; //Game-ID
+  char gid[14]; //Game-ID
   char player[2];//Player-ID
   char config[64] = "client.conf";
 
@@ -68,11 +67,15 @@ int main(int argc,char** argv){
     return -1;
   }
 
+  printf("%s\n", gid);
+  //config Datei auslesen
+  struct Configuration configStruct = setConfig(config);
+
   //create a socket and connect to server
   int *sock;
   sock = (int *)malloc(4*sizeof(int));
   *sock = socket(AF_INET, SOCK_STREAM, 0);
-  connectToServer(sock);
+  connectToServer(sock, configStruct.hostname, configStruct.portnumber);
   printf("gameID %s\nSpieler %s\n", gid, player);
   performConnection(gid, player, sock);
 
