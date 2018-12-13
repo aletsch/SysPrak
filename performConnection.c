@@ -67,10 +67,22 @@ int readServer(int *socket, char *buffer){
   memset(buffer, 0, BUF);
 
   if(read(*socket, buffer, BUF) != 0){
-  printf("Server: %s", buffer);
-  return 0;
-  }
-  return -1;
+    switch (*buffer){
+      case '+': 
+        printf("Server: %s", buffer);
+        return 0;
+        break;
+      case '-':
+        printf("Ungültige Serveranfrage: %s", buffer);
+        exit(EXIT_FAILURE);
+        break;
+      default:
+        printf("Unerwartete Antwort des Servers");
+    }
+    } else {
+    perror("Fehler beim Lesen vom Server: ");
+    return -1;
+    }
 }
 
 int writeServer(int *socket, char *buffer, char message[BUF]){
@@ -90,7 +102,7 @@ int connectToServer(int* sock, char* host, int port){
   ip = (char *)malloc(60*sizeof(char));
   char *hostname = host;
   if (hostname_to_ip(hostname, ip) == 1){
-    exit(EXIT_FAILURE);
+    return 1;
   }
 
 
@@ -103,7 +115,7 @@ int connectToServer(int* sock, char* host, int port){
 
   int connection_status = connect(*sock, (struct sockaddr *) &server_address, sizeof(server_address));
   if (connection_status != 0){
-    printf("Could not connect to server\n");
+    perror("Error: ");
     return -1;
   }
 
