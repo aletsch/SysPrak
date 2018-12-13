@@ -90,18 +90,8 @@ int main(int argc,char** argv){
     return -1;
   }
 
-  printf("%s\n", gid);
   //config Datei auslesen
   struct Configuration configStruct = setConfig(config);
-
-  //create a socket and connect to server
-  int *sock;
-  sock = (int *)malloc(4*sizeof(int));
-  *sock = socket(AF_INET, SOCK_STREAM, 0);
-  connectToServer(sock, configStruct.hostname, configStruct.portnumber);
-  printf("gameID %s\nSpieler %s\n", gid, player);
-  performConnection(gid, player, sock);
-
 
   //create the shared memory
   int shmID;
@@ -113,9 +103,6 @@ int main(int argc,char** argv){
   shm.playerNumber =  atoi(player);
   printf("Player im SHM: %i\n", shm.playerNumber); 
   printf("SHM-ID: %i\n", shmID);
-
-  //close connection
-  close(*sock);
 
   //Erstellen der Pipe
 	int fd[2];
@@ -129,12 +116,19 @@ int main(int argc,char** argv){
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
-        shm.connector = getpid();
+    shm.connector = getpid();
 
 		//Schließen der Schreibseite
 		close(fd[1]);
-		//printf("Hallo ich bin der Kindprozess, der Connector\n");
-    
+    //create a socket and connect to server
+    int *sock;
+    sock = (int *)malloc(4*sizeof(int));
+    *sock = socket(AF_INET, SOCK_STREAM, 0);
+    connectToServer(sock, configStruct.hostname, configStruct.portnumber);
+    performConnection(gid, player, sock);
+
+    //close connection
+    close(*sock);    
 
     close(fd[0]);
   } else {
@@ -143,7 +137,6 @@ int main(int argc,char** argv){
 
     //Schließen der Leseseite
     close(fd[0]);
-    //printf("Hallo ich bin der ElternProzess, der Thinker\n");
     //think();
     close(fd[1]);
 
