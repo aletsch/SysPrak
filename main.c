@@ -10,11 +10,35 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/ipc.h>
+#include <sys/shm.h>
 
 //weitere Programmteile einbinden
 #include "performConnection.c"
 #include "conf.c"
 
+
+struct shm {
+  char gameName[BUF];
+  int playerNumber;
+  int playerCount;
+  pid_t thinker;
+  pid_t connector;
+  char Field1[20];
+  char Field2[20];
+  char Field3[20];
+  char Field4[20];
+  char Field5[20];
+  char Field6[20];
+  char Field7[20];
+  char Field8[20];
+
+} shm;
+
+void error(char message[BUF])
+{
+    printf("Error: %s\n", message);
+    exit(EXIT_FAILURE);
+}
 
 
 void printHilfe(){
@@ -24,8 +48,7 @@ void printHilfe(){
 
 int main(int argc,char** argv){
 
-
-
+  struct shm shm;
   char gid[14]; //Game-ID
   char player[2];//Player-ID
   char config[64] = "client.conf";
@@ -79,23 +102,34 @@ int main(int argc,char** argv){
   printf("gameID %s\nSpieler %s\n", gid, player);
   performConnection(gid, player, sock);
 
+
+  //create the shared memory
+  int shmID;
+  int size;
+  size = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
+  shmID = shmget(IPC_PRIVATE, size ,IPC_CREAT);
+
+  //test
+  shm.playerNumber =  atoi(player);
+  printf("Player im SHM: %i\n", shm.playerNumber); 
+  printf("SHM-ID: %i\n", shmID);
+
   //close connection
   close(*sock);
 
   //Erstellen der Pipe
 	int fd[2];
 	if (pipe(fd) < 0) {
-		printf("Fehler beim Erstellen der pipe\n");
-		exit(EXIT_FAILURE);
+		error("Fehler beim Erstellen der pipe");
 	}
 
 	pid_t pid = fork();
 	if (pid<0) {
-		printf("Fehler beim Gabeln der Prozesse\n");
-		exit(EXIT_FAILURE);
+		error("Fehler beim Gabeln der Prozesse");
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
+        shm.connector = getpid();
 
 		//Schließen der Schreibseite
 		close(fd[1]);
@@ -105,6 +139,7 @@ int main(int argc,char** argv){
     close(fd[0]);
   } else {
     //Hier beginnt der Thinker = ElternProzess
+    shm.thinker = getpid();
 
     //Schließen der Leseseite
     close(fd[0]);
