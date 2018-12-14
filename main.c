@@ -15,6 +15,7 @@
 //weitere Programmteile einbinden
 #include "performConnection.c"
 #include "conf.c"
+#include "communication.c"
 
 
 struct shm {
@@ -126,6 +127,8 @@ int main(int argc,char** argv){
     *sock = socket(AF_INET, SOCK_STREAM, 0);
     connectToServer(sock, configStruct.hostname, configStruct.portnumber);
     performConnection(gid, player, sock);
+
+    communication(sock);
 
     //close connection
     close(*sock);    

@@ -155,17 +155,13 @@ int performConnection(char* gameID, char* player, int* sock){
 
   //gewünschte Mitsplielernummer
   strcpy(temp, "PLAYER ");
-  //strcat(temp, player);
+  strcat(temp, player);
   strcat(temp, "\n");
   writeServer(sock, buffer, temp);
   free(temp);
 
   //Mitspielerantwort
   readServer(sock, buffer);
-
-  //Alle Mitspieler
-  readServer(sock, buffer);
-
 
   return 0;
 }
