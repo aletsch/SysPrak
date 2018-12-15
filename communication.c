@@ -12,28 +12,27 @@ int communication(int *socket){
   char buffer[BUF];
   char temp[BUF];
   while(gameIsRunning){
-    read(*socket, buffer, BUF);
-    printf("%s", buffer);
+    readServer(socket, buffer);
     strcpy(temp, buffer);
     ptr = strtok(temp, " +\n");
     if(strcmp(ptr, "WAIT") == 0){
-       write(*socket, "OKWAIT\n", strlen("OKWAIT\n"));
-       printf("OKWAIT\n");
+       writeServer(socket, buffer, "OKWAIT\n");
     } else if(strcmp(ptr, "GAMEOVER") == 0){
-      read(*socket, buffer, BUF);
-      printf("%s\n", buffer);
+      readServer(socket, buffer);
       gameIsRunning = 0;
     } else if(strcmp(ptr, "MOVE") == 0){
+      //board wird ausgegeben
+      printf("Hier kommt das read nach MOVE\n");
+      readServer(socket, buffer);
       //TODO thinker anstoßen
-      printf("%s\n", buffer);
-      write(*socket, "THINKING", strlen("THINKING"));
-      read(*socket, buffer, BUF);
-      printf("%s\n", buffer);
-      write(*socket, "PLAY E3:D4", strlen("PLAY E3:D4"));
-      read(*socket, buffer, BUF);
-      printf("%s\n", buffer);
+
+      writeServer(socket, buffer, "THINKING\n");
+    } else if(strcmp(ptr, "OKTHINK\n")){
+      //Vom Thinker erhaltenen move übergeben
+      writeServer(socket, buffer, "PLAY B6:C5\n");
+      readServer(socket, buffer);
     } else {
-      printf("wtf was that\n%s", buffer);
+      printf("wtf was that\n");
       gameIsRunning = 0;
     }
   }
