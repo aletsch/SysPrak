@@ -68,7 +68,7 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+': 
-        printf("Server: %s", buffer);
+        //printf("Server: %s", buffer);
         return 0;
         break;
       case '-':
@@ -91,7 +91,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
   strcpy(buffer, message);
 
   if(write(*socket, buffer, strlen(buffer)) != 0){
-  printf("Client: %s", buffer);
+  //printf("Client: %s", buffer);
   return 0;
   }
   return -1;
@@ -122,6 +122,33 @@ int connectToServer(int* sock, char* host, int port){
 
   return 0;
 }
+
+
+int spielerBereit(char* line){
+  char* curLine = line;
+  char *ptr;
+  char* nextLine = strchr(curLine, '\n');
+  char* output = malloc(sizeof(char)*30);
+
+  curLine = nextLine ? (nextLine+1) : NULL;
+  ptr = strtok(curLine, " +");
+  strcpy(output, "Spieler ");
+  strcat(output, ptr);
+  ptr = strtok(NULL, " +\n");
+  strcat(output, " (");
+  strcat(output, ptr);
+  strcat(output, ") ist ");
+  ptr = strtok(NULL, " +\n");
+  if (atoi(ptr)){
+    strcat(output, "noch nicht breit.\n");
+  } else {
+    strcat(output, "bereit.\n");
+  }
+  printf("%s", output);
+  free(output);
+  return 0;
+}
+
 
 int performConnection(char* gameID, char* player, char* gamekind, int* sock){
 
@@ -171,8 +198,9 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
   //Mitspielerantwort
   readServer(sock, buffer);
   readServer(sock, buffer);
+  spielerBereit(buffer);
   
-  //gegebenenfalls erster Zug
+  //THINKING schicken, damit communication eine Nachricht erhält, die es verarbeiten kann
   if(atoi(player) == 0){
     writeServer(sock, buffer, "THINKING\n");
   }
