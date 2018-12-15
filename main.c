@@ -126,7 +126,7 @@ int main(int argc,char** argv){
     sock = (int *)malloc(4*sizeof(int));
     *sock = socket(AF_INET, SOCK_STREAM, 0);
     connectToServer(sock, configStruct.hostname, configStruct.portnumber);
-    performConnection(gid, player, sock);
+    performConnection(gid, player, configStruct.gamekind, sock);
 
     communication(sock);
 

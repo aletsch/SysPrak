@@ -8,7 +8,6 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-
 //#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de\n"
 //#define PORTNUMBER 1357
 #define BUF 256
@@ -77,7 +76,9 @@ int readServer(int *socket, char *buffer){
         exit(EXIT_FAILURE);
         break;
       default:
-        printf("Unerwartete Antwort des Servers");
+        printf("%s\n", buffer);
+        printf("Unerwartete Antwort des Servers\n");
+        exit(EXIT_FAILURE);
     }
     } else {
     perror("Fehler beim Lesen vom Server: ");
@@ -122,7 +123,7 @@ int connectToServer(int* sock, char* host, int port){
   return 0;
 }
 
-int performConnection(char* gameID, char* player, int* sock){
+int performConnection(char* gameID, char* player, char* gamekind, int* sock){
 
   //Kommunikation mit Server
   char buffer[BUF];
@@ -139,7 +140,7 @@ int performConnection(char* gameID, char* player, int* sock){
   readServer(sock, buffer);
 
   //send gameID
-  char* temp = malloc(sizeof(char)*17);
+  char* temp = malloc(BUF);
   strcpy(temp, "ID ");
   strcat(temp, gameID);
   strcat(temp, "\n");
@@ -149,6 +150,13 @@ int performConnection(char* gameID, char* player, int* sock){
 
   //Playing Checkers
   readServer(sock, buffer);
+  char *ptr;
+  ptr = strtok(buffer, " +");
+  ptr = strtok(NULL, " +\n");
+  if(strcmp(ptr, gamekind) != 0){
+    printf("wrong gamekind");
+    exit(EXIT_FAILURE);
+  }  
 
   //Game Name
   readServer(sock, buffer);
@@ -162,6 +170,8 @@ int performConnection(char* gameID, char* player, int* sock){
 
   //Mitspielerantwort
   readServer(sock, buffer);
+  readServer(sock, buffer);
+  printf("Ab hier arbeitet communication\n");
 
   return 0;
 }
