@@ -171,6 +171,11 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
   //Mitspielerantwort
   readServer(sock, buffer);
   readServer(sock, buffer);
+  
+  //gegebenenfalls erster Zug
+  if(atoi(player) == 0){
+    writeServer(sock, buffer, "THINKING\n");
+  }
   printf("Ab hier arbeitet communication\n");
 
   return 0;
