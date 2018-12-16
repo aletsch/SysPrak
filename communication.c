@@ -5,6 +5,12 @@
 #define BUF 256
 
 
+int printBoard(char* board){
+  printf("%s\n", board);
+  //TODO Zeile für Zeile auslesen und Board in shared memory übertragen
+  return 0;
+}
+
 int communication(int *socket){
   int gameIsRunning = 1;
   char *ptr;
@@ -22,11 +28,13 @@ int communication(int *socket){
       gameIsRunning = 0;
     } else if(strcmp(ptr, "MOVE") == 0){
       //board wird ausgegeben
-      printf("Hier kommt das read nach MOVE\n");
       readServer(socket, buffer);
+      printBoard(buffer);
+      writeServer(socket, buffer, "THINKING\n");
+
       //TODO thinker anstoßen
 
-      writeServer(socket, buffer, "THINKING\n");
+
     } else if(strcmp(ptr, "OKTHINK\n")){
       //Vom Thinker erhaltenen move übergeben
       writeServer(socket, buffer, "PLAY B6:C5\n");
