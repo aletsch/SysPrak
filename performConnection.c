@@ -140,9 +140,9 @@ int spielerBereit(char* line){
   strcat(output, ") ist ");
   ptr = strtok(NULL, " +\n");
   if (atoi(ptr)){
-    strcat(output, "noch nicht breit.\n");
-  } else {
     strcat(output, "bereit.\n");
+  } else {
+    strcat(output, "noch nicht bereit.\n");
   }
   printf("%s", output);
   free(output);
