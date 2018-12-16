@@ -140,6 +140,7 @@ int main(int argc,char** argv){
 
     //Schließen der Leseseite
     close(fd[0]);
+    wait(NULL);
     //think();
     close(fd[1]);
 
