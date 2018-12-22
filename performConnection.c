@@ -12,6 +12,13 @@
 //#define PORTNUMBER 1357
 #define BUF 256
 
+char* getLine(char* line){
+  char * curLine = line;
+  char * nextLine = strchr(line, '\n');
+  if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
+  return curLine;
+}
+
 
 int hostname_to_ip(char* host, char *ip){
   struct addrinfo hints, *servinfo, *p;
@@ -68,7 +75,7 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+': 
-        //printf("Server: %s", buffer);
+        printf("Server: %s", buffer);
         return 0;
         break;
       case '-':
@@ -91,7 +98,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
   strcpy(buffer, message);
 
   if(write(*socket, buffer, strlen(buffer)) != 0){
-  //printf("Client: %s", buffer);
+    printf("Client: %s", buffer);
   return 0;
   }
   return -1;
@@ -195,14 +202,16 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
   writeServer(sock, buffer, temp);
   free(temp);
 
-  //Mitspielerantwort
+  //Mitspielerantwort: YOU...
   readServer(sock, buffer);
-  readServer(sock, buffer);
-  spielerBereit(buffer);
   
   //THINKING schicken, damit communication eine Nachricht erhält, die es verarbeiten kann
   if(atoi(player) == 0){
+    readServer(sock, buffer);
     writeServer(sock, buffer, "THINKING\n");
+    readServer(sock, buffer);
+    writeServer(sock, buffer, "PLAY E3:F4\n");
+    readServer(sock, buffer);
   }
   printf("Ab hier arbeitet communication\n");
 
