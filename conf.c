@@ -104,7 +104,7 @@ struct Configuration setConfig(char* file){
   printf("Hostname ist: %s\n", config.hostname);
   printf("Port ist: %d\n", config.portnumber);
   printf("Gamekind ist: %s\n", config.gamekind);
-  /*printf("Hostname ist: %s", getHostname("client.conf"));
+  printf("Hostname ist: %s", getHostname("client.conf"));
   printf("Gamekind ist: %s", getGamekind("client.conf"));
-  printf("Portnumber ist: %d\n", getPort("client.conf"));*/
-//}
+  printf("Portnumber ist: %d\n", getPort("client.conf"));
+}*/
