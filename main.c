@@ -24,14 +24,14 @@ struct shm {
   int playerCount;
   pid_t thinker;
   pid_t connector;
-  char Field1[20];
-  char Field2[20];
-  char Field3[20];
-  char Field4[20];
-  char Field5[20];
-  char Field6[20];
-  char Field7[20];
-  char Field8[20];
+  char field1[20];
+  char field2[20];
+  char field3[20];
+  char field4[20];
+  char field5[20];
+  char field6[20];
+  char field7[20];
+  char field8[20];
 
 } shm;
 
@@ -102,7 +102,7 @@ int main(int argc,char** argv){
 
   //test
   shm.playerNumber =  atoi(player);
-  printf("Player im SHM: %i\n", shm.playerNumber); 
+  printf("Player im SHM: %i\n", shm.playerNumber);
   printf("SHM-ID: %i\n", shmID);
 
   //Erstellen der Pipe
@@ -128,10 +128,11 @@ int main(int argc,char** argv){
     connectToServer(sock, configStruct.hostname, configStruct.portnumber);
     performConnection(gid, player, configStruct.gamekind, sock);
 
-    communication(sock);
+    communication(sock, fd[0]);
+
 
     //close connection
-    close(*sock);    
+    close(*sock);
 
     close(fd[0]);
   } else {
@@ -140,7 +141,14 @@ int main(int argc,char** argv){
 
     //Schließen der Leseseite
     close(fd[0]);
+
+    char message[BUF];
+    strcpy(message, "B6:C5\n");
+    write(fd[1], message, strlen(message) + 1);
+
     wait(NULL);
+
+
     //think();
     close(fd[1]);
 

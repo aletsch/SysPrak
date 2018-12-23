@@ -190,7 +190,7 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
   if(strcmp(ptr, gamekind) != 0){
     printf("wrong gamekind");
     exit(EXIT_FAILURE);
-  }  
+  }
 
   //Game Name
   readServer(sock, buffer);
@@ -204,15 +204,15 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
 
   //Mitspielerantwort: YOU...
   readServer(sock, buffer);
-  
+
   //THINKING schicken, damit communication eine Nachricht erhält, die es verarbeiten kann
-  if(atoi(player) == 0){
-    readServer(sock, buffer);
-    writeServer(sock, buffer, "THINKING\n");
-    readServer(sock, buffer);
-    writeServer(sock, buffer, "PLAY E3:F4\n");
-    readServer(sock, buffer);
-  }
+  // if(atoi(player) == 0){
+  //   readServer(sock, buffer);
+  //   writeServer(sock, buffer, "THINKING\n");
+  //   readServer(sock, buffer);
+  //   writeServer(sock, buffer, "PLAY E3:F4\n");
+  //   readServer(sock, buffer);
+  // }
   printf("Ab hier arbeitet communication\n");
 
   return 0;

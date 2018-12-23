@@ -45,7 +45,7 @@ int printBoard(char* board){
 }
 */
 
-int communication(int *socket){
+int communication(int *socket, int pipe){
   int gameIsRunning = 1;
   char buffer[BUF];
   char *ptr;
@@ -79,7 +79,11 @@ int communication(int *socket){
         break;
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
-        writeServer(socket, buffer, "PLAY B6:C5\n");
+        char message[BUF];
+        read(pipe, message, BUF);
+        strcpy(buffer, "PLAY ");
+        strcat(buffer, message);
+        writeServer(socket, buffer, buffer);
         readServer(socket, buffer);
       } else if(strcmp(ptr, "TOTAL") == 0){
         //nächste Zeilen überspringen: Ende der Prologphase
