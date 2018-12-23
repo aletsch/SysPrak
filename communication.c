@@ -5,9 +5,44 @@
 #define BUF 256
 
 
+char field[8][8];
+
 int printBoard(char* board){
-  printf("%s\n", board);
   //TODO Zeile für Zeile auslesen und Board in shared memory übertragen
+
+  char * curLine = board;
+  int zeile = 7;
+  while(curLine)
+  {
+    char * nextLine = strchr(curLine, '\n');
+    if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
+
+    char temp[64];
+    char *ptr;
+    strcpy(temp, curLine);
+
+    ptr = strtok(temp, " +12345678\n");
+
+    if (strcmp(ptr, "ENDBOARD") == 0){
+      break;
+    }
+
+    for(int i = 0; i <= 7; i++){
+      field[i][zeile] = *ptr;
+      ptr = strtok(NULL, " +12345678\n");
+    }
+
+    if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy    
+    curLine = nextLine ? (nextLine+1) : NULL;
+    zeile--;
+   }
+   
+  for(int i = 7; i >= 0; i--){
+    for(int j = 0; j <= 7; j++){
+      printf("%c ", field[j][i]);
+    }
+    printf("\n");
+  }
   return 0;
 }
 
@@ -71,7 +106,7 @@ int communication(int *socket, int pipe){
       } else if(strcmp(ptr, "BOARD") == 0){
         //folgende Zeile wird verarbeitet
         curLine = nextLine ? (nextLine+1) : NULL;
-        //printBoard(curLine);
+        printBoard(curLine);
         writeServer(socket, buffer, "THINKING\n");
 
         //TODO thinker anstoßen

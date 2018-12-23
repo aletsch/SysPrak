@@ -24,14 +24,7 @@ struct shm {
   int playerCount;
   pid_t thinker;
   pid_t connector;
-  char field1[20];
-  char field2[20];
-  char field3[20];
-  char field4[20];
-  char field5[20];
-  char field6[20];
-  char field7[20];
-  char field8[20];
+  char field[8][8];
 
 } shm;
 
