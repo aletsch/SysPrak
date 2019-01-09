@@ -10,6 +10,9 @@ char field[8][8];
 int printBoard(char* board){
   //TODO Zeile für Zeile auslesen und Board in shared memory übertragen
 
+  int shmID;
+  shmID = shmget(IPC_PRIVATE, 2*sizeof(int)+BUF+2*sizeof(pid_t)+160, 0);
+
   char * curLine = board;
   int zeile = 7;
   while(curLine)

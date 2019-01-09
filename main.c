@@ -42,7 +42,10 @@ void printHilfe(){
 
 int main(int argc,char** argv){
 
+
+
   struct shm shm;
+
   char gid[14]; //Game-ID
   char player[2];//Player-ID
   char config[64] = "client.conf";
@@ -93,6 +96,11 @@ int main(int argc,char** argv){
   size = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
   shmID = shmget(IPC_PRIVATE, size ,IPC_CREAT);
 
+  //attach shared memory to processes
+  int *shmData;
+  shmData = shmat(getpid(), NULL, 0);
+
+
   //test
   shm.playerNumber =  atoi(player);
   printf("Player im SHM: %i\n", shm.playerNumber);
@@ -110,6 +118,7 @@ int main(int argc,char** argv){
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
+                                                  //shmData = shmat(getpid(), NULL, 0);
     shm.connector = getpid();
 
 		//Schließen der Schreibseite
