@@ -36,7 +36,7 @@ void error(char message[BUF])
 
 
 void printHilfe(){
-		printf("Programmaufruf nur mit: -g <gameId> -p <{0,1}>\n");
+		printf("Programmaufruf nur mit: -g <gameId> -p <{1,2}>\n");
 }
 
 
@@ -66,8 +66,12 @@ int main(int argc,char** argv){
         }
         break;
       case 'p':
-        if(pFlag == 0 && (atoi(optarg) == 1 || atoi(optarg) == 0)){
-          strcpy(player, optarg);
+        if(pFlag == 0 && (atoi(optarg) == 2 || atoi(optarg) == 1)){
+          if(atoi(optarg) == 1) {
+            strcpy(player, "0");
+          } else {
+            strcpy(player, "1");
+          }
           pFlag++;
         } else {
           printHilfe();
