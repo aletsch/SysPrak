@@ -18,10 +18,8 @@ struct Spieldaten {
 };
 
 int printBoard(char* board){
-  //TODO Zeile für Zeile auslesen und Board in shared memory übertragen
 
   int shmID;
-  char *shmData;
   struct Spieldaten *spieldaten;
 
   int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
