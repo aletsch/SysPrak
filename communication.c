@@ -2,29 +2,19 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#define BUF 256
 
+#include "main.h"
 
 char field[8][8];
-
-struct Spieldaten {
-  char gameName[BUF];
-  int playerNumber;
-  int playerCount;
-  pid_t thinker;
-  pid_t connector;
-  char field[8][8];
-
-};
 
 int printBoard(char* board){
 
   int shmID;
   struct Spieldaten *spieldaten;
 
-  int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
+  //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
 
-  shmID = shmget(IPC_PRIVATE, shmSize, 0666);
+  shmID = shmget(KEY, SHMSIZE, 0666);
 
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 

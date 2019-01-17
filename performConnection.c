@@ -8,9 +8,9 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+#include "main.h"
 //#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de\n"
 //#define PORTNUMBER 1357
-#define BUF 256
 
 char* getLine(char* line){
   char * curLine = line;
@@ -44,37 +44,13 @@ int hostname_to_ip(char* host, char *ip){
   return 0;
 }
 
-
-/*
-int hostname_to_ip(char * hostname, char* ip){
-  struct hostent *he = gethostbyname(hostname);
-  struct in_addr **addr_list;
-  int i;
-  printf("hostname_to_ip start\n");
-  if(he == NULL){
-    herror("could not find host by name");
-    return 1;
-  }
-
-  addr_list = (struct in_addr **) he->h_addr_list;
-  printf("addr_list initialisiert\n");
-  printf("%s",  inet_ntoa(*addr_list[0]));
-  for(i = 0; addr_list[i] != NULL; i++){
-    printf("%i\n", i);
-    ip =  inet_ntoa(*addr_list[i]);
-    return 0;
-  }
-  return 1;
-}
-*/
-
 int readServer(int *socket, char *buffer){
 
   memset(buffer, 0, BUF);
 
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
-      case '+': 
+      case '+':
         //printf("Server: %s", buffer);
         return 0;
         break;

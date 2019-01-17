@@ -16,6 +16,7 @@
 #include "performConnection.c"
 #include "conf.c"
 #include "communication.c"
+#include "main.h"
 
 
 // struct Spieldaten {
@@ -96,8 +97,8 @@ int main(int argc,char** argv){
 
   //create the shared memory
   int shmID;
-  int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-  shmID = shmget(6543, shmSize ,IPC_CREAT | 0666);
+  //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
+  shmID = shmget(KEY, SHMSIZE ,IPC_CREAT | 0666);
 
   //attach shared memory to processes
   struct Spieldaten *spieldaten;
@@ -159,7 +160,6 @@ int main(int argc,char** argv){
     //struct Spieldaten *spieldaten;
 
     //spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
-
     for(int i = 7; i >= 0; i--){
       for(int j = 0; j <= 7; j++){
         printf("%c ", spieldaten -> field[j][i]);
