@@ -18,15 +18,15 @@
 #include "communication.c"
 
 
-struct shm {
-  char gameName[BUF];
-  int playerNumber;
-  int playerCount;
-  pid_t thinker;
-  pid_t connector;
-  char field[8][8];
-
-} shm;
+// struct Spieldaten {
+//   char gameName[BUF];
+//   int playerNumber;
+//   int playerCount;
+//   pid_t thinker;
+//   pid_t connector;
+//   char field[8][8];
+//
+// } spieldaten;
 
 void error(char message[BUF])
 {
@@ -44,7 +44,7 @@ int main(int argc,char** argv){
 
 
 
-  struct shm shm;
+  //struct shm shm;
 
   char gid[14]; //Game-ID
   char player[2];//Player-ID
@@ -96,19 +96,18 @@ int main(int argc,char** argv){
 
   //create the shared memory
   int shmID;
-  int size;
-  size = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-  shmID = shmget(IPC_PRIVATE, size ,IPC_CREAT);
+  int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
+  shmID = shmget(IPC_PRIVATE, shmSize ,IPC_CREAT | 0666);
 
   //attach shared memory to processes
-  int *shmData;
-  shmData = shmat(getpid(), NULL, 0);
+  struct Spieldaten *spieldaten;
+  spieldaten = (struct Spieldaten * ) shmat(shmID, NULL, 0);
 
 
   //test
-  shm.playerNumber =  atoi(player);
-  printf("Player im SHM: %i\n", shm.playerNumber);
-  printf("SHM-ID: %i\n", shmID);
+  // spieldaten.playerNumber =  atoi(player);
+  // printf("Player im SHM: %i\n", spieldaten.playerNumber);
+  // printf("SHM-ID: %i\n", shmID);
 
   //Erstellen der Pipe
 	int fd[2];
@@ -122,8 +121,8 @@ int main(int argc,char** argv){
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
-                                                  //shmData = shmat(getpid(), NULL, 0);
-    shm.connector = getpid();
+                                    //shmData = shmat(getpid(), NULL, 0);
+    //spieldaten.connector = getpid();
 
 		//Schließen der Schreibseite
 		close(fd[1]);
@@ -143,16 +142,31 @@ int main(int argc,char** argv){
     close(fd[0]);
   } else {
     //Hier beginnt der Thinker = ElternProzess
-    shm.thinker = getpid();
+    //spieldaten.thinker = getpid();
 
     //Schließen der Leseseite
     close(fd[0]);
+
+
 
     char message[BUF];
     strcpy(message, "B6:C5\n");
     write(fd[1], message, strlen(message) + 1);
 
     wait(NULL);
+
+    //ab hier Test SHM
+    //struct Spieldaten *spieldaten;
+
+    //spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+
+    for(int i = 7; i >= 0; i--){
+      for(int j = 0; j <= 7; j++){
+        printf("%c ", spieldaten -> field[j][i]);
+      }
+      printf("\n");
+    }
+    //bis hier Test SHM
 
 
     //think();

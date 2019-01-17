@@ -7,11 +7,29 @@
 
 char field[8][8];
 
+struct Spieldaten {
+  char gameName[BUF];
+  int playerNumber;
+  int playerCount;
+  pid_t thinker;
+  pid_t connector;
+  char field[8][8];
+
+};
+
 int printBoard(char* board){
   //TODO Zeile für Zeile auslesen und Board in shared memory übertragen
 
   int shmID;
-  shmID = shmget(IPC_PRIVATE, 2*sizeof(int)+BUF+2*sizeof(pid_t)+160, 0);
+  char *shmData;
+  struct Spieldaten *spieldaten;
+
+  int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
+
+  shmID = shmget(IPC_PRIVATE, shmSize, 0666);
+
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+
 
   char * curLine = board;
   int zeile = 7;
@@ -31,21 +49,27 @@ int printBoard(char* board){
     }
 
     for(int i = 0; i <= 7; i++){
-      field[i][zeile] = *ptr;
+      spieldaten -> field[i][zeile] = *ptr;
       ptr = strtok(NULL, " +12345678\n");
+
     }
 
-    if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy    
+    if (nextLine) *nextLine = '\n';  // then restore newline-char, just to be tidy
     curLine = nextLine ? (nextLine+1) : NULL;
     zeile--;
    }
-   
+
+  //Board in den shared memory bereid schreiben
+
+  //memcpy(shmData, field, sizeof(field));
+
   for(int i = 7; i >= 0; i--){
     for(int j = 0; j <= 7; j++){
-      printf("%c ", field[j][i]);
+      printf("%c ", spieldaten -> field[j][i]);
     }
     printf("\n");
   }
+
   return 0;
 }
 
