@@ -97,7 +97,7 @@ int main(int argc,char** argv){
   //create the shared memory
   int shmID;
   int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-  shmID = shmget(IPC_PRIVATE, shmSize ,IPC_CREAT | 0666);
+  shmID = shmget(6543, shmSize ,IPC_CREAT | 0666);
 
   //attach shared memory to processes
   struct Spieldaten *spieldaten;
