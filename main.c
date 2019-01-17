@@ -170,6 +170,12 @@ int main(int argc,char** argv){
 
 
     //think();
+
+
+    //zug auf file auslesen und in die pipe schreiben
+
+
+    //files mit möglichen Zügen löschen/leeren
     close(fd[1]);
 
   }
