@@ -31,5 +31,10 @@ struct Configuration{
   char gamekind[64];
 };
 
+struct moeglicherZug{
+  char zug[64];
+  int gewichtung;
+};
+
 
 #endif

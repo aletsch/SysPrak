@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 
-char* getHostname(char* file){
+int getHostname(char* file){
 
   FILE* fpointer;
   char *line = (char*) malloc(sizeof(char)*256);
@@ -27,7 +27,7 @@ char* getHostname(char* file){
   printf("Fehler in der Konfigurationsdatei");
   exit(EXIT_FAILURE);
   free(line);
-  return "hello";
+  return 0;
 }
 
 
@@ -55,7 +55,7 @@ int getPort(char* file){
 }
 
 
-char* getGamekind(char* file){
+int getGamekind(char* file){
 
   FILE* fpointer;
   char *line = (char*) malloc(sizeof(char)*256);
@@ -78,7 +78,7 @@ char* getGamekind(char* file){
   printf("Fehler in der Konfigurationsdatei");
   exit(EXIT_FAILURE);
   free(line);
-  return "hello";
+  return 0;
 }
 
 
