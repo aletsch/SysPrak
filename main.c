@@ -43,10 +43,6 @@ void printHilfe(){
 
 int main(int argc,char** argv){
 
-
-
-  //struct shm shm;
-
   char gid[14]; //Game-ID
   char player[2];//Player-ID
   char config[64] = "client.conf";
@@ -104,6 +100,9 @@ int main(int argc,char** argv){
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten * ) shmat(shmID, NULL, 0);
 
+  strcpy(spieldaten -> gameName, configStruct.gamekind);
+  spieldaten -> playerNumber = atoi(player);
+
 
   //test
   // spieldaten.playerNumber =  atoi(player);
@@ -123,7 +122,7 @@ int main(int argc,char** argv){
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
                                     //shmData = shmat(getpid(), NULL, 0);
-    //spieldaten.connector = getpid();
+    spieldaten -> connector = getpid();
 
 		//Schließen der Schreibseite
 		close(fd[1]);
@@ -143,7 +142,7 @@ int main(int argc,char** argv){
     close(fd[0]);
   } else {
     //Hier beginnt der Thinker = ElternProzess
-    //spieldaten.thinker = getpid();
+    spieldaten -> thinker = getpid();
 
     //Schließen der Leseseite
     close(fd[0]);
