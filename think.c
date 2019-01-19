@@ -46,7 +46,7 @@ int think() {
 
 //falls 'out of bounds'- artige Fehlermeldungen kommen -> if-statements jeweils um
 //"&& (x+1<8) && (x+1>-1) && (y+1<8) && (y+1>-1)" oder Ähnliches ergänzen
-struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove) {
+struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove/* field[8][8] field*/) {
   struct moeglicherZug currentMove;
   currentMove.gewichtung = -1;
   //pawn move
@@ -67,7 +67,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       //beispiel schlagend:
       currentMove.gewichtung = currentMove.gewichtung +2;
       //rekursiver Aufruf mit temporären Feld
-      possibleMovesWhite(x-2, x+2, currentMovee);
+      possibleMovesWhite(x-2, x+2, currentMove //, tempspielfeld);
       if (currentMove.gewichtung > bestMove.gewichtung){
         return currentMove;
       } else {
