@@ -139,10 +139,12 @@ int communication(int *socket, int pipe){
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
         char message[BUF];
+        char anServer[BUF];
         read(pipe, message, BUF);
-        strcpy(buffer, "PLAY ");
-        strcat(buffer, message);
-        writeServer(socket, buffer, buffer);
+        strcpy(anServer, "PLAY ");
+        strcat(anServer, message);
+        printf("%s\n", anServer);
+        writeServer(socket, buffer, anServer);
         readServer(socket, buffer);
       } else if(strcmp(ptr, "TOTAL") == 0){
         //nächste Zeilen überspringen: Ende der Prologphase

@@ -70,6 +70,7 @@ void signalHandler(int signal) {
 
 int main(int argc,char** argv){
 
+
   struct sigaction siga;
 
   char gid[14]; //Game-ID
@@ -178,19 +179,21 @@ int main(int argc,char** argv){
     close(fd[0]);
 
     char finalMove[64];
-    while(1){
-    signal(SIGTERM, signalHandler);
-    strcpy(finalMove, think());
+    //while(1){
+    //signal(SIGTERM, signalHandler);
+    strcpy(finalMove, "B4:C5\n");
+    printf("vor pipe%s \n", finalMove);
     write(fd[1], finalMove, strlen(finalMove));
     memset(finalMove, 0, 64);
     //wait(NULL);
-    }
+    //}
 
     /*char message[BUF];
     strcpy(message, "B6:C5\n");
     write(fd[1], message, strlen(message) + 1);
     */
     wait(NULL);
+    //printf("am Ende %s\n", think());
 
     //ab hier Test SHM
     //struct Spieldaten *spieldaten;
