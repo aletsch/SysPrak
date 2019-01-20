@@ -172,12 +172,16 @@ int main(int argc,char** argv){
     //Hier beginnt der Thinker = ElternProzess
     spieldaten -> thinker = getpid();
 
-    signal(SIGTERM, signalHandler);
 
     //Schließen der Leseseite
     close(fd[0]);
 
 
+    while(1){
+    signal(SIGTERM, signalHandler);
+    write(fd[1], think(), /**/);
+    wait(NULL);
+    }
 
     char message[BUF];
     strcpy(message, "B6:C5\n");
