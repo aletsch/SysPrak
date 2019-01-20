@@ -178,6 +178,8 @@ char* think() {
   struct Spieldaten *spieldaten;
   shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+  char* field[8][8];
+  memcpy(*field, spieldaten->field, sizeof(char)*8*8);
 
   struct moeglicherZug spielzug;
 
@@ -189,7 +191,7 @@ char* think() {
           if (spieldaten->field[x][y] == ('w' || 'W')) {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "PLAY ");
-            spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, spieldaten->field);
+            spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, field);
             free(moveBisher);
             }
           }
