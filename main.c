@@ -162,7 +162,7 @@ int main(int argc,char** argv){
 
     char finalMove[64];
 
-    signal(SIGTERM, signalHandler);
+    signal(SIGUSR1, signalHandler);
 
     strcpy(finalMove, "B4:C5\n");
     printf("vor pipe%s \n", finalMove);
