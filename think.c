@@ -92,7 +92,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'w') {
     //nach links oben
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
-      currentMove.gewichtung = currentMove.gewichtung +2;
+      currentMove.gewichtung = currentMove.gewichtung + 2;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
       currentField[x-1][y+1]  = '*';
@@ -160,7 +160,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, moveBisher);
-    printf("momentaner Zug: %s", ergebnis);
+    printf("momentaner Zug: %s", currentMove.zug);
     printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
       return currentMove;
