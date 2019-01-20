@@ -156,8 +156,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     //moveBisher[(strlen(moveBisher)-1)] = "\0";
 
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
-    strcat(moveBisher, "\n");
-    strcpy(currentMove.zug, moveBisher);
+    strcat(ergebnis, "\n");
+    strcpy(currentMove.zug, ergebnis);
+    printf("thinker sagt erst mal%s\n", ergebnis);
     if (currentMove.gewichtung > bestMove.gewichtung){
       return currentMove;
     } else {
@@ -179,6 +180,7 @@ char* think() {
   shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   char* ergebnis = malloc(sizeof(char)*64);
+  printf("this\n");
 
   struct moeglicherZug spielzug;
 
@@ -191,7 +193,7 @@ char* think() {
         for (int y=7; y>=0; y--) {
           if (spieldaten->field[x][y] == ('w' || 'W')) {
             char* moveBisher  = malloc(sizeof(char)*64);
-            strcpy(moveBisher, "PLAY ");
+            strcpy(moveBisher, "");
             spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
             free(moveBisher);
             }
@@ -207,6 +209,7 @@ char* think() {
     //     }
     //   }
     strcpy(ergebnis, spielzug.zug);
+    printf("thinker sagt%s \n", ergebnis);
     return ergebnis;
   }
 
