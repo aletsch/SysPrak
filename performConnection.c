@@ -51,7 +51,7 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+':
-        printf("Server: %s", buffer);
+        //printf("Server: %s", buffer);
         return 0;
         break;
       case '-':

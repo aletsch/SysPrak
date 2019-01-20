@@ -45,26 +45,7 @@ void printHilfe(){
 
 void signalHandler(int signal) {
 
-    const char *signal_name;
-    sigset_t pending;
-
-    // Find out which signal we're handling
-    switch (signal) {
-        case SIGHUP:
-            signal_name = "SIGHUP";
-            break;
-        case SIGUSR1:
-            signal_name = "SIGUSR1";
-            break;
-        case SIGINT:
-            printf("Caught SIGINT, exiting now\n");
-            exit(0);
-        default:
-            fprintf(stderr, "Caught wrong signal: %d\n", signal);
-            return;
-    }
-
-    //signal(SIGTERM, signalHandler);
+  printBoard();
 }
 
 
@@ -178,44 +159,19 @@ int main(int argc,char** argv){
     //Schließen der Leseseite
     close(fd[0]);
 
+
     char finalMove[64];
-    //while(1){
-    //signal(SIGTERM, signalHandler);
+
+    signal(SIGTERM, signalHandler);
+
     strcpy(finalMove, "B4:C5\n");
     printf("vor pipe%s \n", finalMove);
     write(fd[1], finalMove, strlen(finalMove));
     memset(finalMove, 0, 64);
-    //wait(NULL);
-    //}
 
-    /*char message[BUF];
-    strcpy(message, "B6:C5\n");
-    write(fd[1], message, strlen(message) + 1);
-    */
-    wait(NULL);
-    //printf("am Ende %s\n", think());
-
-    //ab hier Test SHM
-    //struct Spieldaten *spieldaten;
-
-    //spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
-    /*for(int i = 7; i >= 0; i--){
-      for(int j = 0; j <= 7; j++){
-        printf("%c ", spieldaten -> field[j][i]);
-      }
-      printf("\n");
-    }*/
-    //bis hier Test SHM
-
-
-    //think();
-
-
-    //zug auf file auslesen und in die pipe schreiben
-
-
-    //files mit möglichen Zügen löschen/leeren
-    close(fd[1]);
+    while(1){     
+      sleep(1);
+    }
 
   }
 
