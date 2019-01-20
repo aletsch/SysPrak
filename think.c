@@ -75,49 +75,14 @@ int inBound(int x, int y) {
   }
 }
 
-char* think() {
-
-  int shmID;
-  struct Spieldaten *spieldaten;
-  shmID = shmget(KEY, SHMSIZE, 0666);
-  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
-
-  struct moeglicherZug spielzug;
-
-
-  switch (atoi(spieldaten->playerNumber)) {
-    case 0:     //weiß
-      for(int x=0; x<8; x++) {
-        for (int y=7; y>=0; y--) {
-          if (spieldaten->field[x][y] == ('w' || 'W')) {
-            spielzug = possibleMovesWhite(x,y, spielzug, 0, "PLAY ", spieldaten->field);
-            }
-          }
-        }
-      }
-    // case 1:     //schwarz
-    //   for(int x=0, x<8, x++) {
-    //     for (int y=7, y>=0, y--) {
-    //       if (spieldaten.field[x][y] == ('b' || 'B')) {
-    //         possibleMovesBlack();
-    //       }
-    //     }
-    //   }
-    return spielzug->zug;
-  }
-
-
-
-//hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
-
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher[64], char* field[8][8]) {
   char* currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove;
   currentMove.gewichtung = -1;
 
-  strcat(moveBisher, getCoordinate(x,y));         //concate move
-  strcat(moveBisher, ":");
+  strcat(&moveBisher, getCoordinate(x,y));         //concate move
+  strcat(&moveBisher, ":");
 
   //pawn move
   if (spieldaten.field[x][y] == 'w') {
@@ -198,6 +163,42 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       return bestMove;
     }
 }
+
+
+char* think() {
+
+  int shmID;
+  struct Spieldaten *spieldaten;
+  shmID = shmget(KEY, SHMSIZE, 0666);
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+
+  struct moeglicherZug spielzug;
+
+  switch (spieldaten->playerNumber) {
+    case 0:     //weiß
+      for(int x=0; x<8; x++) {
+        for (int y=7; y>=0; y--) {
+          if (spieldaten->field[x][y] == ('w' || 'W')) {
+            spielzug = possibleMovesWhite(x,y, spielzug, 0, "PLAY ", spieldaten->field);
+            }
+          }
+        }
+      }
+    // case 1:     //schwarz
+    //   for(int x=0, x<8, x++) {
+    //     for (int y=7, y>=0, y--) {
+    //       if (spieldaten.field[x][y] == ('b' || 'B')) {
+    //         possibleMovesBlack();
+    //       }
+    //     }
+    //   }
+    return spielzug->zug;
+  }
+
+
+
+//hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
+
 
 //hier werden alle Züge einer schwarzen Figur auf Gültigkeit geprüft
 // int possibleMovesBlack() {
