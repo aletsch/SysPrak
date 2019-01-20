@@ -77,44 +77,48 @@ int inBound(int x, int y) {
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
 
-struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char* currentField[8][8]) {
+struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
+
+  printf("hi\n");
 
   char* ergebnis = malloc(sizeof(char)*64);
-
+  char currentField[8][8];
+  memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove;
   currentMove.gewichtung = -1;
 
   //moveBisher  = malloc(sizeof(char)*64);
   strcat(moveBisher, getCoordinate(x,y));         //concate move
   strcat(moveBisher, ":");
-
   //pawn move
-  if (*currentField[x][y] == 'w') {
+  if (currentField[x][y] == 'w') {
     //nach links oben
-    if (inBound(x-2, y+2) && (*currentField[x-1][y+1] == ('b' || 'B')) && (*currentField[x-2][y+2] == '*')){
+    if (inBound(x-2, y+2) && (currentField[x-1][y+1] == ('b' || 'B')) && (currentField[x-2][y+2] == '*')){
       currentMove.gewichtung = currentMove.gewichtung +2;
-      *currentField[x][y]      = '*';
-      *currentField[x-2][y+2]  = 'w';
-      *currentField[x-1][y+1]  = '*';
+      currentField[x][y]      = '*';
+      currentField[x-2][y+2]  = 'w';
+      currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       currentMove = possibleMovesWhite(x-2, x+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
-    } else if (inBound(x-1, y+1) && (*currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
-      strcat(moveBisher, getCoordinate(x-1, y+1));
-      currentMove.gewichtung++;
-      goto ZUGBEENDEN;
-    }
-    //nach rechts oben
-    if (inBound(x+2, y+2) && (*currentField[x+1][y+1] == ('b' || 'B')) && (*currentField[x+2][y+2] == '*')){
+    } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == ('b' || 'B')) && (currentField[x+2][y+2] == '*')){
       currentMove.gewichtung = currentMove.gewichtung +2;
-      *currentField[x][y]      = '*';
-      *currentField[x+2][y+2]  = 'w';
-      *currentField[x+1][y+1]  = '*';
+      currentField[x][y]      = '*';
+      currentField[x+2][y+2]  = 'w';
+      currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       currentMove = possibleMovesWhite(x+2, x+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
-    } else if (inBound(x+1, y+1) && (*currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
+    } else if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
+      strcat(moveBisher, getCoordinate(x-1, y+1));
+      strcat(moveBisher, ":");
+      printf("moveBewegtLinks: %s\n", moveBisher);
+      currentMove.gewichtung++;
+      goto ZUGBEENDEN;
+    } else if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       strcat(moveBisher, getCoordinate(x+1, y+1));
+      strcat(moveBisher, ":");
+      printf("moveBewegtRechts: %s\n", moveBisher);
       currentMove.gewichtung++;
       goto ZUGBEENDEN;
     }
@@ -157,11 +161,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
-    strcpy(currentMove.zug, ergebnis);
-    printf("thinker sagt erst mal%s\n", ergebnis);
+    strcpy(currentMove.zug, moveBisher);
+    printf("momentaner Zug: %s", ergebnis);
     if (currentMove.gewichtung > bestMove.gewichtung){
+      printf("Gewichtung: %d\n",currentMove.gewichtung);
       return currentMove;
     } else {
+      printf("Gewichtung: %d\n",currentMove.gewichtung);
       return bestMove;
     }
 }
@@ -184,17 +190,20 @@ char* think() {
 
   struct moeglicherZug spielzug;
 
-  char* currentField[8][8];
-  memcpy(*currentField, spieldaten->field, sizeof(char)*8*8);
+  char currentField[8][8];
+  memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
+  char spielStein;
 
   switch (spieldaten->playerNumber) {
     case 0:     //weiß
       for(int x=0; x<8; x++) {
         for (int y=7; y>=0; y--) {
-          if (spieldaten->field[x][y] == ('w' || 'W')) {
+          spielStein = spieldaten->field[x][y];
+          if ( spielStein == 'w' || spielStein == 'W') { 
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
             spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
+            printf("bester Zug bisher: %s\nmit der Gewichtung: %d", spielzug.zug, spielzug.gewichtung);
             free(moveBisher);
             }
           }

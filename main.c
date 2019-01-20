@@ -46,6 +46,8 @@ void printHilfe(){
 void signalHandler(int signal) {
 
   printBoard();
+  think();
+
 }
 
 
