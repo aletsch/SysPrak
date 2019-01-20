@@ -77,10 +77,10 @@ int inBound(int x, int y) {
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
 
-struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char* field[8][8]) {
+struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char* currentField[8][8]) {
+
   char* ergebnis = malloc(sizeof(char)*64);
-  char* currentField[8][8];
-  memcpy(currentField, field, sizeof(char)*8*8);
+
   struct moeglicherZug currentMove;
   currentMove.gewichtung = -1;
 
@@ -178,9 +178,12 @@ char* think() {
   struct Spieldaten *spieldaten;
   shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+  char* ergebnis = malloc(sizeof(char)*64);
 
   struct moeglicherZug spielzug;
 
+  char* currentField[8][8];
+  memcpy(*currentField, spieldaten->field, sizeof(char)*8*8);
 
   switch (spieldaten->playerNumber) {
     case 0:     //weiß
@@ -189,7 +192,7 @@ char* think() {
           if (spieldaten->field[x][y] == ('w' || 'W')) {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "PLAY ");
-            spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, spieldaten->field);
+            spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
             free(moveBisher);
             }
           }
@@ -203,5 +206,6 @@ char* think() {
     //       }
     //     }
     //   }
-    return spielzug.zug;
+    strcpy(ergebnis, spielzug.zug);
+    return ergebnis;
   }
