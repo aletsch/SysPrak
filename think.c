@@ -7,6 +7,66 @@
 #include "main.h"
 
 
+char *getCoordinate(int x, int y){
+  char* coordinate = malloc(sizeof(char) * 3);
+
+  switch(x){
+    case 0:
+      strcpy(coordinate, "A");
+      break;
+    case 1:
+      strcpy(coordinate, "B");
+      break;
+    case 2:
+      strcpy(coordinate, "C");
+      break;
+    case 3:
+      strcpy(coordinate, "D");
+      break;
+    case 4:
+      strcpy(coordinate, "E");
+      break;
+    case 5:
+      strcpy(coordinate, "F");
+      break;
+    case 6:
+      strcpy(coordinate, "G");
+      break;
+    case 7:
+      strcpy(coordinate, "H");
+      break;
+  }
+
+  switch(y){
+    case 0:
+      strcat(coordinate, "1");
+      break;
+    case 1:
+      strcat(coordinate, "2");
+      break;
+    case 2:
+      strcat(coordinate, "3");
+      break;
+    case 3:
+      strcat(coordinate, "4");
+      break;
+    case 4:
+      strcat(coordinate, "5");
+      break;
+    case 5:
+      strcat(coordinate, "6");
+      break;
+    case 6:
+      strcat(coordinate, "7");
+      break;
+    case 7:
+      strcat(coordinate, "9");
+      break;
+  }
+
+  return coordinate;
+}
+
 int think() {
 
   int shmID;
