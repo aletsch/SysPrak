@@ -67,7 +67,15 @@ char *getCoordinate(int x, int y){
   return coordinate;
 }
 
-int think() {
+int inBound(int x, int y) {
+  if ((x<8)&&(x>-1)&&(y<8)&&(y>-1)) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+char* think() {
 
   int shmID;
   struct Spieldaten *spieldaten;
@@ -77,102 +85,102 @@ int think() {
   struct moeglicherZug spielzug;
 
 
-  switch (atoi(spieldaten.playerNumber)) {
+  switch (atoi(spieldaten->playerNumber)) {
     case 0:     //weiß
-      for(int x=0, x<8, x++) {
-        for (int y=7, y>=0, y--) {
-          if (spieldaten.field[x][y] == ('w' || 'W')) {
-            spielzug = possibleMovesWhite();
+      for(int x=0; x<8; x++) {
+        for (int y=7; y>=0; y--) {
+          if (spieldaten->field[x][y] == ('w' || 'W')) {
+            spielzug = possibleMovesWhite(x,y, spielzug, 0, "PLAY ", spieldaten->field);
             }
           }
         }
       }
-    case 1:     //schwarz
-      for(int x=0, x<8, x++) {
-        for (int y=7, y>=0, y--) {
-          if (spieldaten.field[x][y] == ('b' || 'B')) {
-            possibleMovesBlack();
-          }
-        }
-      }
+    // case 1:     //schwarz
+    //   for(int x=0, x<8, x++) {
+    //     for (int y=7, y>=0, y--) {
+    //       if (spieldaten.field[x][y] == ('b' || 'B')) {
+    //         possibleMovesBlack();
+    //       }
+    //     }
+    //   }
+    return spielzug->zug;
   }
-}
-
-
 
 
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
 
-//falls 'out of bounds'- artige Fehlermeldungen kommen -> if-statements jeweils um
-//"&& (x+1<8) && (x+1>-1) && (y+1<8) && (y+1>-1)" oder Ähnliches ergänzen
-struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove/* field[8][8] field*/) {
+struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher[64], char* field[8][8]) {
+  char* currentField[8][8];
+  memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove;
   currentMove.gewichtung = -1;
+
+  strcat(moveBisher, getCoordinate(x,y));         //concate move
+  strcat(moveBisher, ":");
+
   //pawn move
   if (spieldaten.field[x][y] == 'w') {
     //nach links oben
-    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-      //beispiel nicht schlagend:
-      currentMove.gewichtung++;
-      if (currentMove.gewichtung > bestMove.gewichtung){
-        return curentMove;
-      } else {
-        return bestMove;
-      }
-    } else if (inBound(x-2, y+2) && (spieldaten.field[x-1][y+1] == ('b' || 'B')) && (spieldaten.field[x-2][y+2] == '*')){
-      //TODO diesen move in "schlagende Züge"-Datei schreiben
-      //bzw eigentlich nach weiteren, den Zug vollendenden, schlagenden Zügen suchen (rekursiv?)
-      //beispiel schlagend:
+    if (inBound(x-2, y+2) && (spieldaten.field[x-1][y+1] == ('b' || 'B')) && (spieldaten.field[x-2][y+2] == '*')){
       currentMove.gewichtung = currentMove.gewichtung +2;
+      currentField[x][y]      = '*';
+      currentField[x-2][y+2]  = 'w';
+      currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      possibleMovesWhite(x-2, x+2, currentMove /*, tempspielfeld*/);
-      if (currentMove.gewichtung > bestMove.gewichtung){
-        return currentMove;
-      } else {
-        return bestMove;
-      }
+      currentMove = possibleMovesWhite(x-2, x+2, currentMove, 1 , moveBisher, currentField);
+      goto ZUGBEENDEN;
+    } else if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*') && (geschlagen == 0)) {
+      strcat(moveBisher, getCoordinate(x-1, y+1));
+      currentMove.gewichtung++;
+      goto ZUGBEENDEN;
     }
-    //nach rechts open
-    if (inBound(x+1, y+1) && spieldaten.field[x+1][y+1] == '*') {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    } else if (inBound(x+2, y+2) && (spieldaten.field[x+1][y+1] == ('b' || 'B')) && (spieldaten.field[x+2][y+2] == '*')){
-      //TODO diesen move in "schlagende Züge"-Datei schreiben
-      //bzw eigentlich nach weiteren, den Zug vollendenden, schlagenden Zügen suchen (rekursiv?)
+    //nach rechts oben
+    if (inBound(x+2, y+2) && (spieldaten.field[x+1][y+1] == ('b' || 'B')) && (spieldaten.field[x+2][y+2] == '*')){
+      currentMove.gewichtung = currentMove.gewichtung +2;
+      currentField[x][y]      = '*';
+      currentField[x+2][y+2]  = 'w';
+      currentField[x+1][y+1]  = '*';
+      //rekursiver Aufruf mit temporären Feld
+      currentMove = possibleMovesWhite(x+2, x+2, currentMove, 1 , moveBisher, currentField);
+      goto ZUGBEENDEN;
+    } else if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*') && (geschlagen == 0)) {
+      strcat(moveBisher, getCoordinate(x+1, y+1));
+      currentMove.gewichtung++;
+      goto ZUGBEENDEN;
     }
 
   }
   //Queen move
-  if (spieldaten.field[x][y] == 'W') {
-
-    //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
-
-    //TODO schauen ob Queen schlagen kann
-
-
-
-
-    //nach nicht schlagenden Zügen suchen
-      //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
-
-    //nach links oben
-    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach rechts oben
-    if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach links unten
-    if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach rechts unten
-    if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-  }
+  // if (spieldaten.field[x][y] == 'W') {
+  //
+  //   //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
+  //
+  //   //TODO schauen ob Queen schlagen kann
+  //
+  //
+  //
+  //
+  //   //nach nicht schlagenden Zügen suchen
+  //     //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
+  //
+  //   //nach links oben
+  //   if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
+  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+  //   }
+  //   //nach rechts oben
+  //   if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
+  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+  //   }
+  //   //nach links unten
+  //   if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
+  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+  //   }
+  //   //nach rechts unten
+  //   if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
+  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+  //   }
+  // }
 
 
 // ünnötig geworden durch 2-Dateien Idee
@@ -180,20 +188,19 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   //   //TODO move in die pipe schreiben
   //   return 1;
   // }
-  return bestMove;
+  ZUGBEENDEN:
+    moveBisher[strlen(moveBisher)-1] = "\0";
+    strcat(moveBisher, "\n");
+    strcpy(currentMove->zug, moveBisher);
+    if (currentMove->gewichtung > bestMove->gewichtung){
+      return currentMove;
+    } else {
+      return bestMove;
+    }
 }
 
 //hier werden alle Züge einer schwarzen Figur auf Gültigkeit geprüft
-int possibleMovesBlack() {
-
-  return 0;
-}
-
-
-int inBound(int x, int y) {
-  if ((x<8)&&(x>-1)&&(y<8)&&(y>-1)) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
+// int possibleMovesBlack() {
+//
+//   return 0;
+// }

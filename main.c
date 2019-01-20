@@ -18,6 +18,7 @@
 #include "conf.c"
 #include "communication.c"
 #include "main.h"
+#include "think.c"
 
 
 // struct Spieldaten {
@@ -176,29 +177,31 @@ int main(int argc,char** argv){
     //Schließen der Leseseite
     close(fd[0]);
 
-
+    char finalMove[64];
     while(1){
     signal(SIGTERM, signalHandler);
-    write(fd[1], think(), /**/);
-    wait(NULL);
+    strcpy(finalMove, think());
+    write(fd[1], finalMove, strlen(finalMove));
+    memset(finalMove, 0, 64);
+    //wait(NULL);
     }
 
-    char message[BUF];
+    /*char message[BUF];
     strcpy(message, "B6:C5\n");
     write(fd[1], message, strlen(message) + 1);
-
+    */
     wait(NULL);
 
     //ab hier Test SHM
     //struct Spieldaten *spieldaten;
 
     //spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
-    for(int i = 7; i >= 0; i--){
+    /*for(int i = 7; i >= 0; i--){
       for(int j = 0; j <= 7; j++){
         printf("%c ", spieldaten -> field[j][i]);
       }
       printf("\n");
-    }
+    }*/
     //bis hier Test SHM
 
 
@@ -216,4 +219,3 @@ int main(int argc,char** argv){
 
   return EXIT_SUCCESS;
 }
-
