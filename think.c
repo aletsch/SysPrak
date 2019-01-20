@@ -91,7 +91,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   //pawn move
   if (currentField[x][y] == 'w') {
     //nach links oben
-    if (inBound(x-2, y+2) && (currentField[x-1][y+1] == ('b' || 'B')) && (currentField[x-2][y+2] == '*')){
+    if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
       currentMove.gewichtung = currentMove.gewichtung +2;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
@@ -99,7 +99,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       //rekursiver Aufruf mit temporären Feld
       currentMove = possibleMovesWhite(x-2, x+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
-    } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == ('b' || 'B')) && (currentField[x+2][y+2] == '*')){
+    } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
       currentMove.gewichtung = currentMove.gewichtung +2;
       currentField[x][y]      = '*';
       currentField[x+2][y+2]  = 'w';
