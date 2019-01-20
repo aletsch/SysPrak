@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 #include "main.h"
 
@@ -96,6 +97,12 @@ int printBoard(char* board){
 */
 
 int communication(int *socket, int pipe){
+  
+  int shmID;
+  struct Spieldaten *spieldaten;
+  shmID = shmget(KEY, SHMSIZE, 0666);
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+  
   int gameIsRunning = 1;
   char buffer[BUF];
   char *ptr;
@@ -124,7 +131,9 @@ int communication(int *socket, int pipe){
         printBoard(curLine);
         writeServer(socket, buffer, "THINKING\n");
 
-        //TODO thinker anstoßen
+        // thinker anstoßen
+        kill(spieldaten -> thinker, 10);
+        
 
         break;
       } else if(strcmp(ptr, "OKTHINK") == 0){
@@ -156,6 +165,9 @@ int communication(int *socket, int pipe){
   }
   return 0;
 }
+
+
+
 
 /*int communication(int *socket){
   int gameIsRunnino");

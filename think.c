@@ -112,7 +112,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   //pawn move
   if (spieldaten.field[x][y] == 'w') {
     //nach links oben
-    if (spieldaten.field[x-1][y+1] == '*') {
+    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
       //beispiel nicht schlagend:
       currentMove.gewichtung++;
@@ -121,13 +121,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       } else {
         return bestMove;
       }
-    } else if ((spieldaten.field[x-1][y+1] == ('b' || 'B')) && (spieldaten.field[x-2][y+2] == '*')){
+    } else if (inBound(x-2, y+2) && (spieldaten.field[x-1][y+1] == ('b' || 'B')) && (spieldaten.field[x-2][y+2] == '*')){
       //TODO diesen move in "schlagende Züge"-Datei schreiben
       //bzw eigentlich nach weiteren, den Zug vollendenden, schlagenden Zügen suchen (rekursiv?)
       //beispiel schlagend:
       currentMove.gewichtung = currentMove.gewichtung +2;
       //rekursiver Aufruf mit temporären Feld
-      possibleMovesWhite(x-2, x+2, currentMove //, tempspielfeld);
+      possibleMovesWhite(x-2, x+2, currentMove /*, tempspielfeld*/);
       if (currentMove.gewichtung > bestMove.gewichtung){
         return currentMove;
       } else {
@@ -135,9 +135,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       }
     }
     //nach rechts open
-    if (spieldaten.field[x+1][y+1] == '*') {
+    if (inBound(x+1, y+1) && spieldaten.field[x+1][y+1] == '*') {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    } else if ((spieldaten.field[x+1][y+1] == ('b' || 'B')) && (spieldaten.field[x+2][y+2] == '*')){
+    } else if (inBound(x+2, y+2) && (spieldaten.field[x+1][y+1] == ('b' || 'B')) && (spieldaten.field[x+2][y+2] == '*')){
       //TODO diesen move in "schlagende Züge"-Datei schreiben
       //bzw eigentlich nach weiteren, den Zug vollendenden, schlagenden Zügen suchen (rekursiv?)
     }
@@ -157,19 +157,19 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
 
     //nach links oben
-    if (spieldaten.field[x-1][y+1] == '*') {
+    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
     }
     //nach rechts oben
-    if (spieldaten.field[x+1][y+1] == '*') {
+    if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
     }
     //nach links unten
-    if (spieldaten.field[x-1][y-1] == '*') {
+    if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
     }
     //nach rechts unten
-    if (spieldaten.field[x+1][y-1] == '*') {
+    if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
       //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
     }
   }
@@ -187,4 +187,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 int possibleMovesBlack() {
 
   return 0;
+}
+
+
+int inBound(int x, int y) {
+  if ((x<8)&&(x>-1)&&(y<8)&&(y>-1)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
