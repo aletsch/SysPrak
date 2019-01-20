@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <signal.h>
 
 //weitere Programmteile einbinden
 #include "performConnection.c"
@@ -41,7 +42,34 @@ void printHilfe(){
 }
 
 
+void signalHandler(int signal) {
+
+    const char *signal_name;
+    sigset_t pending;
+
+    // Find out which signal we're handling
+    switch (signal) {
+        case SIGHUP:
+            signal_name = "SIGHUP";
+            break;
+        case SIGUSR1:
+            signal_name = "SIGUSR1";
+            break;
+        case SIGINT:
+            printf("Caught SIGINT, exiting now\n");
+            exit(0);
+        default:
+            fprintf(stderr, "Caught wrong signal: %d\n", signal);
+            return;
+    }
+
+    //signal(SIGTERM, signalHandler);
+}
+
+
 int main(int argc,char** argv){
+
+  struct sigaction siga;
 
   char gid[14]; //Game-ID
   char player[2];//Player-ID
@@ -144,6 +172,8 @@ int main(int argc,char** argv){
     //Hier beginnt der Thinker = ElternProzess
     spieldaten -> thinker = getpid();
 
+    signal(SIGTERM, signalHandler);
+
     //Schließen der Leseseite
     close(fd[0]);
 
@@ -182,3 +212,4 @@ int main(int argc,char** argv){
 
   return EXIT_SUCCESS;
 }
+

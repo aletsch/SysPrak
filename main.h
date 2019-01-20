@@ -14,6 +14,7 @@
 #define SHMSIZE 2*sizeof(int)+BUF+2*sizeof(pid_t)+160
 
 extern void error(char message[BUF]);
+extern void signalHandler(int signal);
 
 struct Spieldaten {
   char gameName[BUF];
