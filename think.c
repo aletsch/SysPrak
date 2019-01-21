@@ -159,7 +159,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
-    strcpy(currentMove.zug, moveBisher);
+    strcpy(currentMove.zug, ergebnis);
     printf("momentaner Zug: %s", currentMove.zug);
     printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
@@ -185,6 +185,8 @@ char* think() {
   char* ergebnis = malloc(sizeof(char)*64);
 
   struct moeglicherZug spielzug;
+  strcpy(spielzug.zug, "");
+  spielzug.gewichtung = -2;
 
   char currentField[8][8];
   memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
@@ -199,7 +201,7 @@ char* think() {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
             spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
-            printf("bester Zug bisher: %s\nmit der Gewichtung: %d\n\n", spielzug.zug, spielzug.gewichtung);
+            printf("bester Zug bisher: %smit der Gewichtung: %d\n\n", spielzug.zug, spielzug.gewichtung);
             free(moveBisher);
             }
           }

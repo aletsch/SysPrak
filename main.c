@@ -166,7 +166,7 @@ int main(int argc,char** argv){
 
     signal(SIGUSR1, signalHandler);
 
-    strcpy(finalMove, "B4:C5\n");
+    strcpy(finalMove, "E3:D4\n");
     printf("vor pipe%s \n", finalMove);
     write(fd[1], finalMove, strlen(finalMove));
     memset(finalMove, 0, 64);
