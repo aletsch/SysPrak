@@ -90,8 +90,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   strcat(moveBisher, ":");
   //pawn move
   if (currentField[x][y] == 'w') {
-    //nach links oben
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
+      //nach links oben schlagen
       currentMove.gewichtung = currentMove.gewichtung + 2;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
@@ -100,7 +100,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentMove = possibleMovesWhite(x-2, x+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
     } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
-      currentMove.gewichtung = currentMove.gewichtung +2;
+      //nach rechts oben schlagen
+      currentMove.gewichtung = currentMove.gewichtung + 2;
       currentField[x][y]      = '*';
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
@@ -108,15 +109,17 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentMove = possibleMovesWhite(x+2, x+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
     } else if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
+      //nach links oben bewegen
       strcat(moveBisher, getCoordinate(x-1, y+1));
       strcat(moveBisher, ":");
-      printf("moveBewegtLinks: %s\n", moveBisher);
+      //printf("moveBewegtLinks: %s\n", moveBisher);
       currentMove.gewichtung++;
       goto ZUGBEENDEN;
     } else if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
+      //nach rechts oben bewegen
       strcat(moveBisher, getCoordinate(x+1, y+1));
       strcat(moveBisher, ":");
-      printf("moveBewegtRechts: %s\n", moveBisher);
+      //printf("moveBewegtRechts: %s\n", moveBisher);
       currentMove.gewichtung++;
       goto ZUGBEENDEN;
     }
@@ -160,8 +163,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
-    printf("momentaner Zug: %s", currentMove.zug);
-    printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
+    //printf("momentaner Zug: %s", currentMove.zug);
+    //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
       return currentMove;
     } else {
