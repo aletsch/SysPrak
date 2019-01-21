@@ -83,7 +83,11 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove;
-  currentMove.gewichtung = -1;
+  if(geschlagen){
+    currentMove.gewichtung = bestMove.gewichtung;
+  } else {
+    currentMove.gewichtung = -1;
+  }
 
   //moveBisher  = malloc(sizeof(char)*64);
   strcat(moveBisher, getCoordinate(x,y));         //concate move
