@@ -44,6 +44,8 @@ void printHilfe(){
 
 
 void signalHandler(int signal) {
+  //damit das makefile nicht meckert
+  signal = signal +1;
 
   printBoard();
   think();
@@ -53,8 +55,8 @@ void signalHandler(int signal) {
 
 int main(int argc,char** argv){
 
-
-  struct sigaction siga;
+  //damit das makefile nicht meckert.... weiß nicht ob das hier wichtig ist
+  //struct sigaction siga;
 
   char gid[14]; //Game-ID
   char player[2];//Player-ID

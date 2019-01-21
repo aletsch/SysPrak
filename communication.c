@@ -6,7 +6,7 @@
 
 #include "main.h"
 
-int printBoard(){
+void printBoard(){
 
   struct Spieldaten *spieldaten;
 
