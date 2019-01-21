@@ -111,7 +111,6 @@ int communication(int *socket, int pipe){
         read(pipe, message, BUF);
         strcpy(anServer, "PLAY ");
         strcat(anServer, message);
-        printf("%s\n", anServer);
         writeServer(socket, buffer, anServer);
         readServer(socket, buffer);
       } else if(strcmp(ptr, "TOTAL") == 0){
