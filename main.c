@@ -31,8 +31,7 @@
 //
 // } spieldaten;
 
-void error(char message[BUF])
-{
+void error(char message[BUF]){
     printf("Error: %s\n", message);
     exit(EXIT_FAILURE);
 }
@@ -44,7 +43,7 @@ void printHilfe(){
 
 
 void signalHandler(int signal) {
-  
+
   int shmID = shmget(KEY, SHMSIZE, 0666);
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
@@ -53,7 +52,7 @@ void signalHandler(int signal) {
 
   printBoard();
 
-  char finalMove[64] = 0;
+  char finalMove[64] = "";
 
   strcpy(finalMove, think());
   write(spieldaten->fdWrite, think(), strlen(finalMove));
@@ -185,13 +184,10 @@ int main(int argc,char** argv){
     //write(fd[1], finalMove, strlen(finalMove));
     //memset(finalMove, 0, 64);
 
-    while(1){     
+    while(1){
       sleep(1);
     }
-
     close(fd[1]);
   }
-
-
   return EXIT_SUCCESS;
 }
