@@ -88,8 +88,10 @@ int communication(int *socket, int pipe){
       if(strcmp(ptr, "WAIT") == 0){
         writeServer(socket, buffer, "OKWAIT\n");
       } else if(strcmp(ptr, "GAMEOVER") == 0){
-        readServer(socket, buffer);
-        return -1;
+        //readServer(socket, buffer);
+        printf("gameover\n");
+        kill(spieldaten -> thinker, SIGTERM);
+        return 0;
       } else if(strcmp(ptr, "MOVE") == 0){
         //macht einfach gar nichts, weil wir nicht wissen ob wir neu lesen müssen, vielleicht Zeit für Spielzug rausnehmen(falls wir den thinker optimieren wollen)
 

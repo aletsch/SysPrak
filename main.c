@@ -44,12 +44,26 @@ void printHilfe(){
 
 
 void signalHandler(int signal) {
-  //damit das makefile nicht meckert
-  signal = signal +1;
+  
+  int shmID = shmget(KEY, SHMSIZE, 0666);
+  struct Spieldaten *spieldaten;
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+
+  signal = signal +1;   //damit das makefile nicht meckert
 
   printBoard();
-  think();
 
+  char finalMove[64];
+
+  strcpy(finalMove, think());
+
+  write(spieldaten->fdWrite, think(), strlen(finalMove));
+  memset(finalMove, 0, 64);
+
+}
+
+void signalTerm(int signal){
+  exit(EXIT_SUCCESS);
 }
 
 
@@ -162,20 +176,22 @@ int main(int argc,char** argv){
 
     //Schließen der Leseseite
     close(fd[0]);
+    spieldaten->fdWrite = fd[1];
 
-
-    char finalMove[64];
+    //char finalMove[64];
 
     signal(SIGUSR1, signalHandler);
+    signal(SIGTERM, signalTerm);
 
-    strcpy(finalMove, "E1:F2\n");
-    write(fd[1], finalMove, strlen(finalMove));
-    memset(finalMove, 0, 64);
+    //strcpy(finalMove, "A3:B4\n");
+    //write(fd[1], finalMove, strlen(finalMove));
+    //memset(finalMove, 0, 64);
 
     while(1){     
       sleep(1);
     }
 
+    close(fd[1]);
   }
 
 

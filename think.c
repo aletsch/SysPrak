@@ -60,9 +60,12 @@ char *getCoordinate(int x, int y){
       strcat(coordinate, "7");
       break;
     case 7:
-      strcat(coordinate, "9");
+      strcat(coordinate, "8");
       break;
   }
+
+  printf("x: %d, y: %d\n", x, y);
+  printf("Koordinate: %s\n", coordinate);
 
   return coordinate;
 }
@@ -101,7 +104,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x-2][y+2]  = 'w';
       currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesWhite(x-2, x+2, currentMove, 1 , moveBisher, currentField);
+      currentMove = possibleMovesWhite(x-2, y+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
     } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
       //nach rechts oben schlagen
@@ -110,7 +113,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesWhite(x+2, x+2, currentMove, 1 , moveBisher, currentField);
+      currentMove = possibleMovesWhite(x+2, y+2, currentMove, 1 , moveBisher, currentField);
       goto ZUGBEENDEN;
     } else if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
@@ -201,8 +204,8 @@ char* think() {
 
   switch (spieldaten->playerNumber) {
     case 0:     //weiß
-      for(int x=0; x<8; x++) {
-        for (int y=7; y>=0; y--) {
+      for(int y=0; y<8; y++) {
+        for (int x=0; x<8; x++) {
           spielStein = spieldaten->field[x][y];
           if ( spielStein == 'w' || spielStein == 'W') { 
             char* moveBisher  = malloc(sizeof(char)*64);

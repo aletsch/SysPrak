@@ -23,6 +23,7 @@ struct Spieldaten {
   pid_t thinker;
   pid_t connector;
   char field[8][8];
+  int fdWrite;
 
 };
 
