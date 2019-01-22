@@ -53,7 +53,7 @@ void signalHandler(int signal) {
 
   printBoard();
 
-  char finalMove[64] = 0;
+  char finalMove[64] = "";
 
   strcpy(finalMove, think());
   write(spieldaten->fdWrite, think(), strlen(finalMove));
