@@ -129,36 +129,39 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     }
 
   }
-  //Queen move
-  // if (spieldaten.field[x][y] == 'W') {
-  //
-  //   //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
-  //
-  //   //TODO schauen ob Queen schlagen kann
-  //
-  //
-  //
-  //
-  //   //nach nicht schlagenden Zügen suchen
-  //     //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
-  //
-  //   //nach links oben
-  //   if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
-  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-  //   }
-  //   //nach rechts oben
-  //   if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
-  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-  //   }
-  //   //nach links unten
-  //   if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
-  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-  //   }
-  //   //nach rechts unten
-  //   if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
-  //     //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-  //   }
-  // }
+
+  /*
+  Queen move
+  if (spieldaten.field[x][y] == 'W') {
+
+    //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
+
+    //TODO schauen ob Queen schlagen kann
+
+
+
+
+    //nach nicht schlagenden Zügen suchen
+      //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
+
+    //nach links oben
+    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
+      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+    }
+    //nach rechts oben
+    if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
+      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+    }
+    //nach links unten
+    if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
+      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+    }
+    //nach rechts unten
+    if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
+      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
+    }
+  }
+  */
 
 
   ZUGBEENDEN:
@@ -176,11 +179,74 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     }
 }
 
-//hier werden alle Züge einer schwarzen Figur auf Gültigkeit geprüft
-// int possibleMovesBlack() {
-//
-//   return 0;
-// }
+struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
+
+  char* ergebnis = malloc(sizeof(char)*64);
+  char currentField[8][8];
+  memcpy(currentField, field, sizeof(char)*8*8);
+  struct moeglicherZug currentMove;
+  if(geschlagen){
+    currentMove.gewichtung = bestMove.gewichtung;
+  } else {
+    currentMove.gewichtung = -1;
+  }
+
+  //moveBisher  = malloc(sizeof(char)*64);
+  strcat(moveBisher, getCoordinate(x,y));         //concate move
+  strcat(moveBisher, ":");
+  //pawn move
+  if (currentField[x][y] == 'w') {
+    if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
+      //nach links unten schlagen
+      currentMove.gewichtung = currentMove.gewichtung + 2;
+      currentField[x][y]      = '*';
+      currentField[x-2][y-2]  = 'b';
+      currentField[x-1][y-1]  = '*';
+      //rekursiver Aufruf mit temporären Feld
+      currentMove = possibleMovesBlack(x-2, y-2, currentMove, 1 , moveBisher, currentField);
+      goto ZUGBEENDEN;
+    } else if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*')){
+      //nach rechts unten schlagen
+      currentMove.gewichtung = currentMove.gewichtung + 2;
+      currentField[x][y]      = '*';
+      currentField[x+2][y-2]  = 'b';
+      currentField[x+1][y-1]  = '*';
+      //rekursiver Aufruf mit temporären Feld
+      currentMove = possibleMovesBlack(x+2, y-2, currentMove, 1 , moveBisher, currentField);
+      goto ZUGBEENDEN;
+    } else if (inBound(x-1, y-1) && (currentField[x-1][y-1] == '*') && (geschlagen == 0)) {
+      //nach links unten bewegen
+      strcat(moveBisher, getCoordinate(x-1, y-1));
+      strcat(moveBisher, ":");
+      //printf("moveBewegtLinks: %s\n", moveBisher);
+      currentMove.gewichtung++;
+      goto ZUGBEENDEN;
+    } else if (inBound(x+1, y-1) && (currentField[x+1][y-1] == '*') && (geschlagen == 0)) {
+      //nach rechts unten bewegen
+      strcat(moveBisher, getCoordinate(x+1, y-1));
+      strcat(moveBisher, ":");
+      //printf("moveBewegtRechts: %s\n", moveBisher);
+      currentMove.gewichtung++;
+      goto ZUGBEENDEN;
+    }
+
+  }
+
+  ZUGBEENDEN:
+    //moveBisher[(strlen(moveBisher)-1)] = "\0";
+
+    strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
+    strcat(ergebnis, "\n");
+    strcpy(currentMove.zug, ergebnis);
+    //printf("momentaner Zug: %s", currentMove.zug);
+    //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
+    if (currentMove.gewichtung > bestMove.gewichtung){
+      return currentMove;
+    } else {
+      return bestMove;
+    }
+}
+
 
 
 char* think() {
@@ -204,7 +270,7 @@ char* think() {
       for(int y=0; y<8; y++) {
         for (int x=0; x<8; x++) {
           spielStein = spieldaten->field[x][y];
-          if ( spielStein == 'w' || spielStein == 'W') { 
+          if (spielStein == 'w' || spielStein == 'W') {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
             spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
@@ -213,17 +279,20 @@ char* think() {
             }
           }
         }
+    case 1:     //schwarz
+      for(int x=0; x<8; x++) {
+        for (int y=7; y>=0; y--) {
+          spielStein = spieldaten->field[x][y];
+          if (spielStein == 'b' || spielStein == 'B') {
+            char* moveBisher  = malloc(sizeof(char)*64);
+            strcpy(moveBisher, "");
+            spielzug = possibleMovesBlack(x,y, spielzug, 0, moveBisher, currentField);
+            printf("bester Zug bisher: %smit der Gewichtung: %d\n\n", spielzug.zug, spielzug.gewichtung);
+            free(moveBisher);
+          }
+        }
       }
-    // case 1:     //schwarz
-    //   for(int x=0, x<8, x++) {
-    //     for (int y=7, y>=0, y--) {
-    //       if (spieldaten.field[x][y] == ('b' || 'B')) {
-    //         possibleMovesBlack();
-    //       }
-    //     }
-    //   }
     strcpy(ergebnis, spielzug.zug);
     printf("thinker sagt%s \n", ergebnis);
     return ergebnis;
   }
-
