@@ -147,7 +147,6 @@ int communication(int *socket, int pipe){
       } else if(strcmp(ptr, "BOARD") == 0){
         //folgende Zeile wird verarbeitet
         curLine = nextLine ? (nextLine+1) : NULL;
-        printf("curline before: %s\n", curLine);
         char board[BUF] = "";
         strcpy(board, curLine);
         updateBoard(board);
@@ -165,7 +164,6 @@ int communication(int *socket, int pipe){
 
       } else if(strcmp(ptr, "ENDBOARD")== 0){
         //nothing
-        printf("hi2\n");
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
         char message[BUF] = "";
@@ -186,13 +184,11 @@ int communication(int *socket, int pipe){
 
       } else {
         printf("wtf was that\n%s\n", ptr);
-        //printf("%s\n", curLine);
         return -1;
   }
 
 
 
-      //gameIsRunning = inputVerarbeiten(curLine, socket);
       curLine = nextLine ? (nextLine+1) : NULL;
     }while(*curLine);
   }

@@ -51,7 +51,7 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+':
-        printf("Server: %s", buffer);
+        //printf("Server: %s", buffer);
         return 0;
         break;
       case '-':
@@ -107,32 +107,6 @@ int connectToServer(int* sock, char* host, int port){
 
   return 0;
 }
-
-
-/*int spielerBereit(char* line){
-  char* curLine = line;
-  char *ptr;
-  char* nextLine = strchr(curLine, '\n');
-  char* output = malloc(sizeof(char)*30);
-
-  curLine = nextLine ? (nextLine+1) : NULL;
-  ptr = strtok(curLine, " +");
-  strcpy(output, "Spieler ");
-  strcat(output, ptr);
-  ptr = strtok(NULL, " +\n");
-  strcat(output, " (");
-  strcat(output, ptr);
-  strcat(output, ") ist ");
-  ptr = strtok(NULL, " +\n");
-  if (atoi(ptr)){
-    strcat(output, "bereit.\n");
-  } else {
-    strcat(output, "noch nicht bereit.\n");
-  }
-  printf("%s", output);
-  free(output);
-  return 0;
-}*/
 
 
 int performConnection(char* gameID, char* player, char* gamekind, int* sock){
