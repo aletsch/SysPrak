@@ -296,3 +296,4 @@ char* think() {
     printf("thinker sagt%s \n", ergebnis);
     return ergebnis;
   }
+}
