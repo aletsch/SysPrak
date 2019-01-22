@@ -195,7 +195,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   strcat(moveBisher, getCoordinate(x,y));         //concate move
   strcat(moveBisher, ":");
   //pawn move
-  if (currentField[x][y] == 'w') {
+  if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
       //nach links unten schlagen
       currentMove.gewichtung = currentMove.gewichtung + 2;
