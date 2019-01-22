@@ -63,6 +63,31 @@ int updateBoard(char* board){
   return 0;
 }
 
+int spielerBereit(char* line){
+  char* curLine = line;
+  char *ptr;
+  char* nextLine = strchr(curLine, '\n');
+  char* output = malloc(sizeof(char)*30);
+
+  curLine = nextLine ? (nextLine+1) : NULL;
+  ptr = strtok(curLine, " +");
+  strcpy(output, "Spieler ");
+  strcat(output, ptr);
+  ptr = strtok(NULL, " +\n");
+  strcat(output, " (");
+  strcat(output, ptr);
+  strcat(output, ") ist ");
+  ptr = strtok(NULL, " +\n");
+  if (atoi(ptr)){
+    strcat(output, "bereit.\n");
+  } else {
+    strcat(output, "noch nicht bereit.\n");
+  }
+  printf("%s", output);
+  free(output);
+  return 0;
+}
+
 
 int communication(int *socket, int pipe){
 
@@ -71,11 +96,14 @@ int communication(int *socket, int pipe){
   shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
-  int gameIsRunning = 1;
+  int gameover = 0;
+  int playerOneWon = 0;
+  int playerTwoWon = 0;
+
   char buffer[BUF] = "";
   char *ptr;
   char temp[BUF] = "";
-  while(gameIsRunning){
+  while(1){
     readServer(socket, buffer);
     char * curLine = buffer; //curline ist ab ist der start der aktuellen Zeile
     do{
@@ -88,8 +116,29 @@ int communication(int *socket, int pipe){
       if(strcmp(ptr, "WAIT") == 0){
         writeServer(socket, buffer, "OKWAIT\n");
       } else if(strcmp(ptr, "GAMEOVER") == 0){
-        //readServer(socket, buffer);
-        printf("gameover\n");
+        gameover = 1;
+      } else if(strcmp(ptr, "PLAYER0WON") == 0){
+        ptr = strtok(NULL, " +\n");
+        if (strcmp(ptr, "Yes") == 0){
+          playerOneWon = 1;
+        } else {
+          playerOneWon = 0;
+        }
+      } else if(strcmp(ptr, "PLAYER1WON") == 0){
+        ptr = strtok(NULL, " +\n");
+        if (strcmp(ptr, "Yes") == 0){
+          playerTwoWon = 1;
+        } else {
+          playerTwoWon = 0;
+        }
+      } else if(strcmp(ptr, "QUIT") == 0){
+        if(playerOneWon == playerTwoWon){
+          printf("It's a tie.\n");
+        } else if((playerOneWon > playerTwoWon && (spieldaten -> playerNumber) == 0)|| (playerTwoWon > playerOneWon && (spieldaten -> playerNumber) == 1)){
+          printf("Congratulations, you won!\n");
+        } else {
+          printf("You lose\n");
+        }
         kill(spieldaten -> thinker, SIGTERM);
         return 0;
       } else if(strcmp(ptr, "MOVE") == 0){
@@ -98,14 +147,25 @@ int communication(int *socket, int pipe){
       } else if(strcmp(ptr, "BOARD") == 0){
         //folgende Zeile wird verarbeitet
         curLine = nextLine ? (nextLine+1) : NULL;
-        updateBoard(curLine);
-        writeServer(socket, buffer, "THINKING\n");
+        printf("curline before: %s\n", curLine);
+        char board[BUF] = "";
+        strcpy(board, curLine);
+        updateBoard(board);
+        if (gameover == 0){
+          writeServer(socket, buffer, "THINKING\n");
 
-        // thinker anstoßen
-        kill(spieldaten -> thinker, SIGUSR1);
+          // thinker anstoßen
+          kill(spieldaten -> thinker, SIGUSR1);
+        } else {
+          for (int i = 0; i<10; i++){
+            curLine = nextLine ? (nextLine+1) : NULL;
+            nextLine = strchr(curLine, '\n');
+          }
+        }
 
-
-        break;
+      } else if(strcmp(ptr, "ENDBOARD")== 0){
+        //nothing
+        printf("hi2\n");
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
         char message[BUF] = "";
@@ -122,6 +182,8 @@ int communication(int *socket, int pipe){
         curLine = nextLine ? (nextLine+1) : NULL;
         nextLine = strchr(curLine, '\n');
         curLine = nextLine ? (nextLine+1) : NULL;
+      } else if(strcmp(ptr, "OKTHINK") == 0){
+
       } else {
         printf("wtf was that\n%s\n", ptr);
         //printf("%s\n", curLine);

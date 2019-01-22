@@ -109,7 +109,7 @@ int connectToServer(int* sock, char* host, int port){
 }
 
 
-int spielerBereit(char* line){
+/*int spielerBereit(char* line){
   char* curLine = line;
   char *ptr;
   char* nextLine = strchr(curLine, '\n');
@@ -132,7 +132,7 @@ int spielerBereit(char* line){
   printf("%s", output);
   free(output);
   return 0;
-}
+}*/
 
 
 int performConnection(char* gameID, char* player, char* gamekind, int* sock){
