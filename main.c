@@ -53,7 +53,7 @@ void signalHandler(int signal) {
 
   printBoard();
 
-  char finalMove[64];
+  char finalMove[64] = "";
 
   strcpy(finalMove, think());
 
@@ -72,8 +72,8 @@ int main(int argc,char** argv){
   //damit das makefile nicht meckert.... weiß nicht ob das hier wichtig ist
   //struct sigaction siga;
 
-  char gid[14]; //Game-ID
-  char player[2];//Player-ID
+  char gid[14] = ""; //Game-ID
+  char player[2] = "";//Player-ID
   char config[64] = "client.conf";
 
   // Kommandozeilenparameter einlesen

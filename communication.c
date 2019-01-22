@@ -23,7 +23,7 @@ void printBoard(){
 
 int updateBoard(char* board){
 
-  int shmID;
+  int shmID = 0;
   struct Spieldaten *spieldaten;
 
   //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
@@ -40,7 +40,7 @@ int updateBoard(char* board){
     char * nextLine = strchr(curLine, '\n');
     if (nextLine) *nextLine = '\0';  // temporarily terminate the current line
 
-    char temp[64];
+    char temp[64] = "";
     char *ptr;
     strcpy(temp, curLine);
 
@@ -66,15 +66,15 @@ int updateBoard(char* board){
 
 int communication(int *socket, int pipe){
 
-  int shmID;
+  int shmID = 0;
   struct Spieldaten *spieldaten;
   shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
   int gameIsRunning = 1;
-  char buffer[BUF];
+  char buffer[BUF] = "";
   char *ptr;
-  char temp[BUF];
+  char temp[BUF] = "";
   while(gameIsRunning){
     readServer(socket, buffer);
     char * curLine = buffer; //curline ist ab ist der start der aktuellen Zeile
@@ -108,8 +108,8 @@ int communication(int *socket, int pipe){
         break;
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
-        char message[BUF];
-        char anServer[BUF];
+        char message[BUF] = "";
+        char anServer[BUF] = "";
         read(pipe, message, BUF);
         strcpy(anServer, "PLAY ");
         strcat(anServer, message);

@@ -51,7 +51,7 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+':
-        //printf("Server: %s", buffer);
+        printf("Server: %s", buffer);
         return 0;
         break;
       case '-':
@@ -138,7 +138,7 @@ int spielerBereit(char* line){
 int performConnection(char* gameID, char* player, char* gamekind, int* sock){
 
   //Kommunikation mit Server
-  char buffer[BUF];
+  char buffer[BUF] = "";
 
   //get Server version
   readServer(sock, buffer);

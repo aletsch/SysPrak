@@ -64,9 +64,6 @@ char *getCoordinate(int x, int y){
       break;
   }
 
-  printf("x: %d, y: %d\n", x, y);
-  printf("Koordinate: %s\n", coordinate);
-
   return coordinate;
 }
 
