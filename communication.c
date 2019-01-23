@@ -157,14 +157,12 @@ int communication(int *socket, int pipe){
           // thinker anstoßen
           kill(spieldaten -> thinker, SIGUSR1);
         } else {
-          for (int i = 0; i<10; i++){
+          for (int i = 0; i<9; i++){
             curLine = nextLine ? (nextLine+1) : NULL;
             nextLine = strchr(curLine, '\n');
           }
         }
 
-      } else if(strcmp(ptr, "ENDBOARD")== 0){
-        //nothing
       } else if(strcmp(ptr, "OKTHINK") == 0){
         //Vom Thinker erhaltenen move übergeben
         char message[BUF] = "";
