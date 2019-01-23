@@ -74,9 +74,97 @@ int inBound(int x, int y) {
     return 0;
   }
 }
+//rx Richung x: -1 links +1 rechts
+//ry Richtung y: -1 unten +1 oben
+struct queenData queenStrike(int rx, int ry, struct queenData strike)
+{
+
+    
+
+    for (int distance = 1; distance<8; distance ++){
+        int xnew = strike.x+(distance*rx);
+        int ynew = strike.y+(distance*ry);
+        if(inBound(xnew, ynew))
+        {
+            if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew-1][ynew+1] == '*')
+                {
+                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
+                    strike.field[xnew][ynew]      = '*';
+                    strike.field[xnew-1][ynew+1]  = *strike.ownColour;
+                    strike.field[xnew-1][ynew+1]  = '*';
+                    strcat(strike.moveATM, getCoordinate(xnew-1,ynew+1));
+                    strcat(strike.moveATM, ":");
+                    strike.success = 1;
+                    strike.x=strike.x+(distance*rx);
+                    strike.y=strike.y +(distance*ry);
+                    
+                    //rekursiver Aufruf mit temporärem Feld
+                    strike = queenStrike(xnew-1, ynew+1, strike);
+                }
+        }
+        else
+        { break; }
+    }
+
+
+    return strike;
+}
+
+//enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
+//ownColour muss in Grossbuchstabe sein
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour){
+    //create and fill queenData
+    struct queenData strike;
+    strike.x = x;
+    strike.y = y;
+    strike.success = 0;
+    strcpy(strike.moveATM,moveBisher);
+    memcpy(strike.field, field, sizeof(char)*8*8);
+    memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
+    strcpy(strike.ownColour, ownColour);   //, sizeof(char));
+    strike.bestMove = bestMove;
+
+    //nach links oben schlagen
+
+    strike = queenStrike(-1,1,strike);
+
+    /*for (int distance = 1; distance<8; distance ++){
+        int xnew = x-distance;
+        int ynew = y+distance;
+        if(inBound(xnew, ynew))
+        {
+            if((currentField[xnew][ynew] == enemyColour[1] || currentField[xnew][ynew] == enemyColour[2] ) && currentField[xnew-1][ynew+1] == '*')
+                {
+                    currentMove.gewichtung = currentMove.gewichtung + 2;
+                    currentField[xnew][ynew]      = '*';
+                    currentField[xnew-1][ynew+1]  = ownColour;
+                    currentField[xnew-1][ynew+1]  = '*';
+                    strcat(moveBisher, getCoordinate(xnew-1,ynew+1));
+                    strcat(moveBisher, ':');
+                    
+                    //rekursiver Aufruf mit temporärem Feld
+                    currentMove = queenMove(xnew-1, ynew+1, currentMove, 1 , moveBisher, currentField, ownColour);
+                }
+        }
+        else
+        { break; }
+    }*/
+
+    
+
+    //nach rechts oben schlagen
+
+    //nach links unten schalgen
+
+    //nach rechts unten schlagen
+
+
+    //release variables
+    return strike.bestMove;
+} 
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
-
+//Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen"; 
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
   char* ergebnis = malloc(sizeof(char)*64);
@@ -130,12 +218,34 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
   }
 
+
+    if(currentField[x][y] == 'W'){
+        char* enemyColour[2];
+        strcpy(enemyColour[1], "b");
+        strcpy(enemyColour[2], "B");
+        char* ownColour;
+        strcpy(ownColour,"W");
+        queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        }
+    
   /*
-  Queen move
-  if (spieldaten.field[x][y] == 'W') {
+  //Queen move
+  if (currentField[x][y] == 'W') {
+    //suche Schlag links oben
+    if(inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
+        
+    
+
+    //suche Schlag rechts oben
+
+    //suche Schlag links unten
+
+    //suche Schlag rechts unten
+
+
 
     //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
-
+    
     //TODO schauen ob Queen schlagen kann
 
 
@@ -296,4 +406,5 @@ char* think() {
     printf("thinker sagt%s \n", ergebnis);
     return ergebnis;
   }
+  return ergebnis;
 }
