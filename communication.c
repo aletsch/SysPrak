@@ -133,6 +133,7 @@ int communication(int *socket, int pipe){
         }
       } else if(strcmp(ptr, "QUIT") == 0){
         if(playerOneWon == playerTwoWon){
+          printf("playerone: %d  playertwo: %d\n", playerOneWon, playerTwoWon);
           printf("It's a tie.\n");
         } else if((playerOneWon > playerTwoWon && (spieldaten -> playerNumber) == 0)|| (playerTwoWon > playerOneWon && (spieldaten -> playerNumber) == 1)){
           printf("Congratulations, you won!\n");

@@ -6,6 +6,14 @@
 
 #include "main.h"
 
+int getTeam(char spielstein){
+  if(spielstein == 'w' || spielstein == 'W'){
+    return 0;
+  } else if(spielstein == 'b' || spielstein == 'B'){
+    return 1;
+  }
+}
+
 
 char *getCoordinate(int x, int y){
   char* coordinate = malloc(sizeof(char) * 3);
@@ -82,57 +90,43 @@ int inBound(int x, int y) {
 
 //rx Richung x: -1 links +1 rechts
 //ry Richtung y: -1 unten +1 oben
-struct queenData queenStrike(int rx, int ry, struct queenData strike)
-{
-    struct queenData temp;
-    
+struct queenData queenStrike(int rx, int ry, struct queenData strike){
+  struct queenData temp;
 
-    for (int distance = 1; distance<8; distance ++){
-        int xnew = strike.x+(distance*rx);
-        int ynew = strike.y+(distance*ry);
-        if(inBound(xnew, ynew))
-        {
-            if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew+rx][ynew+ry] == '*')
-                {
-                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
-                    strike.field[strike.x][strike.y]      = '*';
-                    strike.field[xnew+rx][ynew+ry]  = *strike.ownColour;
-                    strike.field[xnew][ynew]  = '*';
-                    strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
-                    strcat(strike.moveATM, ":");
-                    strike.x=strike.x+(distance*rx);
-                    strike.y=strike.y+(distance*ry);
-                    
-                    //rekursiver Aufruf mit temporärem Feld
-                    temp=queenStrike(rx,ry,strike);
-                    if(temp.success==1)
-                    {
-                        //strike = queenStrike(rx, ry, strike);
-                        strike=temp;
-                    }
-                    else
-                    {
-                        strike.success=1;                    
-                    }
-                    
-                }
-            else
-            {
-                //rechts oben
-                queenStrike(1,1,strike);
-                //links unten
-                queenStrike(-1,-1,strike);
-                //rechts unten
-                queenStrike(1,-1,strike);
-            }
+  for (int distance = 1; distance<8; distance ++){
+    int xnew = strike.x+(distance*rx);
+    int ynew = strike.y+(distance*ry);
+    if(inBound(xnew, ynew)){
+      if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew+rx][ynew+ry] == '*'){
+        strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
+        strike.field[strike.x][strike.y]      = '*';
+        strike.field[xnew+rx][ynew+ry]  = *strike.ownColour;
+        strike.field[xnew][ynew]  = '*';
+        strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
+        strcat(strike.moveATM, ":");
+        strike.x=strike.x+(distance*rx);
+        strike.y=strike.y+(distance*ry);
+
+        //rekursiver Aufruf mit temporärem Feld
+        temp=queenStrike(rx,ry,strike);
+          if(temp.success==1){
+          //strike = queenStrike(rx, ry, strike);
+          strike=temp;
+        } else {
+          strike.success=1;
         }
-        else
-        {
-            break;
-        }
+      } else {
+        //rechts oben
+        queenStrike(1,1,strike);
+        //links unten
+        queenStrike(-1,-1,strike);
+        //rechts unten
+        queenStrike(1,-1,strike);
+      }
+    } else {
+      break;
     }
-
-
+  }
     return strike;
 }
 
@@ -141,26 +135,24 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour)
-{
-    //create and fill queenData
-    struct queenData strike;
-    strike.x = x;
-    strike.y = y;
-    strike.success = 0;
-    strcpy(strike.moveATM,moveBisher);
-    memcpy(strike.field, field, sizeof(char)*8*8);
-    memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
-    strcpy(strike.ownColour, ownColour);   //, sizeof(char));
-    strike.bestMove = bestMove;
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour){
+  //create and fill queenData
+  struct queenData strike;
+  strike.x = x;
+  strike.y = y;
+  strike.success = 0;
+  strcpy(strike.moveATM,moveBisher);
+  memcpy(strike.field, field, sizeof(char)*8*8);
+  memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
+  strcpy(strike.ownColour, ownColour);   //, sizeof(char));
+  strike.bestMove = bestMove;
 
-    //nach schlagenden zügen Suchen (Anfang links oben)
-
-    strike = queenStrike(-1,1,strike);
+  //nach schlagenden zügen Suchen (Anfang links oben)
+  strike = queenStrike(-1,1,strike);
 
 
-    //release variables
-    return strike.bestMove;
+  //release variables
+  return strike.bestMove;
 } 
 
 
