@@ -67,6 +67,8 @@ char *getCoordinate(int x, int y){
   return coordinate;
 }
 
+
+
 int inBound(int x, int y) {
   if ((x<8)&&(x>-1)&&(y<8)&&(y>-1)) {
     return 1;
@@ -74,11 +76,15 @@ int inBound(int x, int y) {
     return 0;
   }
 }
+
+
+
+
 //rx Richung x: -1 links +1 rechts
 //ry Richtung y: -1 unten +1 oben
 struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
-
+    struct queenData temp;
     
 
     for (int distance = 1; distance<8; distance ++){
@@ -92,23 +98,46 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     strike.field[strike.x][strike.y]      = '*';
                     strike.field[xnew+rx][ynew+ry]  = *strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
-                    strcat(strike.moveATM, getCoordinate(xnew-rx,ynew+ry));
+                    strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
                     strcat(strike.moveATM, ":");
-                    strike.success = 1;
                     strike.x=strike.x+(distance*rx);
-                    strike.y=strike.y +(distance*ry);
+                    strike.y=strike.y+(distance*ry);
                     
                     //rekursiver Aufruf mit temporärem Feld
-                    strike = queenStrike(xnew-rx, ynew+ry, strike);
+                    temp=queenStrike(rx,ry,strike);
+                    if(temp.success==1)
+                    {
+                        //strike = queenStrike(rx, ry, strike);
+                        strike=temp;
+                    }
+                    else
+                    {
+                        strike.success=1;                    
+                    }
+                    
                 }
+            else
+            {
+                //rechts oben
+                queenStrike(1,1,strike);
+                //links unten
+                queenStrike(-1,-1,strike);
+                //rechts unten
+                queenStrike(1,-1,strike);
+            }
         }
         else
-        { break; }
+        {
+            break;
+        }
     }
 
 
     return strike;
 }
+
+
+
 
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
@@ -125,44 +154,17 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int 
     strcpy(strike.ownColour, ownColour);   //, sizeof(char));
     strike.bestMove = bestMove;
 
-    //nach links oben schlagen
+    //nach schlagenden zügen Suchen (Anfang links oben)
 
     strike = queenStrike(-1,1,strike);
-
-    /*for (int distance = 1; distance<8; distance ++){
-        int xnew = x-distance;
-        int ynew = y+distance;
-        if(inBound(xnew, ynew))
-        {
-            if((currentField[xnew][ynew] == enemyColour[1] || currentField[xnew][ynew] == enemyColour[2] ) && currentField[xnew-1][ynew+1] == '*')
-                {
-                    currentMove.gewichtung = currentMove.gewichtung + 2;
-                    currentField[xnew][ynew]      = '*';
-                    currentField[xnew-1][ynew+1]  = ownColour;
-                    currentField[xnew-1][ynew+1]  = '*';
-                    strcat(moveBisher, getCoordinate(xnew-1,ynew+1));
-                    strcat(moveBisher, ':');
-                    
-                    //rekursiver Aufruf mit temporärem Feld
-                    currentMove = queenMove(xnew-1, ynew+1, currentMove, 1 , moveBisher, currentField, ownColour);
-                }
-        }
-        else
-        { break; }
-    }*/
-
-    
-
-    //nach rechts oben schlagen
-
-    //nach links unten schalgen
-
-    //nach rechts unten schlagen
 
 
     //release variables
     return strike.bestMove;
 } 
+
+
+
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
 //Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen"; 
@@ -219,14 +221,14 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
   }
 
-
+    //prepare and start queenMove
     if(currentField[x][y] == 'W'){
         char* enemyColour[2];
         strcpy(enemyColour[1], "b");
         strcpy(enemyColour[2], "B");
         char* ownColour;
         strcpy(ownColour,"W");
-        queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        moveBisher=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
         }
     
   /*

@@ -42,7 +42,7 @@ struct queenData{
   struct moeglicherZug bestMove;
   int x;   //akt Position
   int y;   //akt Position
-  int success; //erfolg 1 sonst 0
+  int success; //erfolg 1 (also schlagen) sonst 0
   char* moveATM;
   char field[8][8];
   char* enemyColour[2];
