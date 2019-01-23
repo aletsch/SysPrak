@@ -47,6 +47,6 @@ struct queenData{
   char field[8][8];
   char* enemyColour[2];
   char* ownColour;
-}
+};
 
 #endif

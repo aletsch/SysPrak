@@ -86,20 +86,20 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
         int ynew = strike.y+(distance*ry);
         if(inBound(xnew, ynew))
         {
-            if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew-1][ynew+1] == '*')
+            if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew+rx][ynew+ry] == '*')
                 {
                     strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
-                    strike.field[xnew][ynew]      = '*';
-                    strike.field[xnew-1][ynew+1]  = *strike.ownColour;
-                    strike.field[xnew-1][ynew+1]  = '*';
-                    strcat(strike.moveATM, getCoordinate(xnew-1,ynew+1));
+                    strike.field[strike.x][strike.y]      = '*';
+                    strike.field[xnew+rx][ynew+ry]  = *strike.ownColour;
+                    strike.field[xnew][ynew]  = '*';
+                    strcat(strike.moveATM, getCoordinate(xnew-rx,ynew+ry));
                     strcat(strike.moveATM, ":");
                     strike.success = 1;
                     strike.x=strike.x+(distance*rx);
                     strike.y=strike.y +(distance*ry);
                     
                     //rekursiver Aufruf mit temporärem Feld
-                    strike = queenStrike(xnew-1, ynew+1, strike);
+                    strike = queenStrike(xnew-rx, ynew+ry, strike);
                 }
         }
         else
@@ -112,7 +112,8 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour){
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour)
+{
     //create and fill queenData
     struct queenData strike;
     strike.x = x;
@@ -389,6 +390,7 @@ char* think() {
             }
           }
         }
+      break;
     case 1:     //schwarz
       for(int x=0; x<8; x++) {
         for (int y=7; y>=0; y--) {
@@ -402,9 +404,10 @@ char* think() {
           }
         }
       }
-    strcpy(ergebnis, spielzug.zug);
-    printf("thinker sagt%s \n", ergebnis);
-    return ergebnis;
+    break;
   }
+
+  strcpy(ergebnis, spielzug.zug);
+  printf("thinker sagt%s \n", ergebnis);
   return ergebnis;
 }
