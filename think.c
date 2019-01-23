@@ -84,6 +84,7 @@ int inBound(int x, int y) {
 //ry Richtung y: -1 unten +1 oben
 struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
+    printf("Starte queenStrike");
     struct queenData temp;
     
 
@@ -96,7 +97,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                 {
                     strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
                     strike.field[strike.x][strike.y]      = '*';
-                    strike.field[xnew+rx][ynew+ry]  = *strike.ownColour;
+                    strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
                     strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
                     strcat(strike.moveATM, ":");
@@ -105,7 +106,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     
                     //rekursiver Aufruf mit temporärem Feld
                     temp=queenStrike(rx,ry,strike);
-                    if(temp.success==1)
+                    if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
                         //strike = queenStrike(rx, ry, strike);
                         strike=temp;
@@ -119,11 +120,25 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
             else
             {
                 //rechts oben
-                queenStrike(1,1,strike);
+                temp=queenStrike(1,1,strike);
+                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                {
+                    strike=temp;
+                }
+
                 //links unten
-                queenStrike(-1,-1,strike);
+                temp=queenStrike(-1,-1,strike);
+                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                {
+                    strike=temp;
+                }
+
                 //rechts unten
-                queenStrike(1,-1,strike);
+                temp=queenStrike(1,-1,strike);
+                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                {
+                    strike=temp;
+                }                
             }
         }
         else
@@ -141,23 +156,32 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char* ownColour)
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char ownColour)
 {
+    printf("Start queenMove");
     //create and fill queenData
     struct queenData strike;
+    printf("1\n");
     strike.x = x;
+    printf("2\n");
     strike.y = y;
+    printf("3\n");
     strike.success = 0;
+    printf("4\n");
     strcpy(strike.moveATM,moveBisher);
+    printf("5\n");
     memcpy(strike.field, field, sizeof(char)*8*8);
+    printf("6\n");
     memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
-    strcpy(strike.ownColour, ownColour);   //, sizeof(char));
+    printf("7\n");
+    strike.ownColour = ownColour;   //, sizeof(char));
+    printf("8\n");
     strike.bestMove = bestMove;
 
     //nach schlagenden zügen Suchen (Anfang links oben)
 
     strike = queenStrike(-1,1,strike);
-
+    printf("Nach queenStrike");
 
     //release variables
     return strike.bestMove;
@@ -226,8 +250,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
         char* enemyColour[2];
         strcpy(enemyColour[1], "b");
         strcpy(enemyColour[2], "B");
-        char* ownColour;
-        strcpy(ownColour,"W");
+        char ownColour = 'W';
         currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
         goto ZUGBEENDEN;
         }
@@ -250,6 +273,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 }
 
 struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
+
+  printf("Start possibleMovesBlack\n");
 
   char* ergebnis = malloc(sizeof(char)*64);
   char currentField[8][8];
@@ -301,6 +326,23 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     }
 
   }
+
+
+  //else
+  //{
+    //prepare and start queenMove
+    if(currentField[x][y] == 'B'){
+        printf("Starte queenMove\n");
+        char* enemyColour[2];
+        strcpy(enemyColour[1], "w");
+        strcpy(enemyColour[2], "W");
+        char ownColour = 'B';
+        //strcpy(ownColour,"B");
+        printf("Starte queenMove\n");
+        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        goto ZUGBEENDEN;
+        }
+  //}
 
   ZUGBEENDEN:
     //moveBisher[(strlen(moveBisher)-1)] = "\0";
@@ -354,6 +396,7 @@ char* think() {
       for(int x=0; x<8; x++) {
         for (int y=7; y>=0; y--) {
           spielStein = spieldaten->field[x][y];
+          printf("Spielstein: %c\n", spielStein);
           if (spielStein == 'b' || spielStein == 'B') {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
