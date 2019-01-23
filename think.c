@@ -279,6 +279,7 @@ char* think() {
             }
           }
         }
+      break;
     case 1:     //schwarz
       for(int x=0; x<8; x++) {
         for (int y=7; y>=0; y--) {
@@ -292,8 +293,9 @@ char* think() {
           }
         }
       }
-    strcpy(ergebnis, spielzug.zug);
-    printf("thinker sagt%s \n", ergebnis);
-    return ergebnis;
+    break;
   }
+  strcpy(ergebnis, spielzug.zug);
+  printf("thinker sagt%s \n", ergebnis);
+  return ergebnis;
 }
