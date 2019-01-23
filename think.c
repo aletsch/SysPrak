@@ -228,53 +228,10 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
         strcpy(enemyColour[2], "B");
         char* ownColour;
         strcpy(ownColour,"W");
-        moveBisher=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        goto ZUGBEENDEN;
         }
     
-  /*
-  //Queen move
-  if (currentField[x][y] == 'W') {
-    //suche Schlag links oben
-    if(inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
-        
-    
-
-    //suche Schlag rechts oben
-
-    //suche Schlag links unten
-
-    //suche Schlag rechts unten
-
-
-
-    //TODO erstmal nachschauen ob schon ein schlagender Zug gefunden wurde
-    
-    //TODO schauen ob Queen schlagen kann
-
-
-
-
-    //nach nicht schlagenden Zügen suchen
-      //hier fehlt noch: Dame kann theoretisch weiter als nur ein Feld laufen
-
-    //nach links oben
-    if (inBound(x-1, y+1) && (spieldaten.field[x-1][y+1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach rechts oben
-    if (inBound(x+1, y+1) && (spieldaten.field[x+1][y+1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach links unten
-    if (inBound(x-1, y-1) && (spieldaten.field[x-1][y-1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-    //nach rechts unten
-    if (inBound(x+1, y-1) && (spieldaten.field[x+1][y-1] == '*')) {
-      //TODO diesen move in "nicht schlagende Züge"-Datei schreiben
-    }
-  }
-  */
 
 
   ZUGBEENDEN:
