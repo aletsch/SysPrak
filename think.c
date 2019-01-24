@@ -136,13 +136,8 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     temp=queenStrike(-1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
-                        //strike = queenStrike(rx, ry, strike);
                         strike=temp;
                     }
-                    /*else
-                    {
-                        strike.success=1;                    
-                    }*/
 
 
                     //rechts oben
