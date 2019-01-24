@@ -108,12 +108,15 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
     //printf("Starte queenStrike\n");
     struct queenData temp;
-    
+
 
     for (int distance = 1; distance<8; distance ++){
         int xnew = strike.x+(distance*rx);
         int ynew = strike.y+(distance*ry);
-        if(inBound(xnew, ynew)&&inBound(xnew+rx,ynew+ry))
+        if (strike.field[xnew][ynew] != '*' && (strike.field[xnew][ynew] != strike.enemyColour[0] &&strike.field[xnew][ynew] != strike.enemyColour[1])) {
+          break;
+        }
+        if(inBound(xnew, ynew) && inBound(xnew+rx,ynew+ry))
         {
             printField(strike.field);
             if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*')
@@ -129,7 +132,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     strike.y=ynew+ry;
                     printField(strike.field);
                     printf("\n");
-                    
+
 
                     //rekursiver Aufruf für Folgeschläge
                     //links oben
@@ -160,9 +163,9 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     {
                         strike=temp;
                     }
-                    
+
                 }
-                
+
             }
     }
 return strike;
@@ -185,11 +188,11 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int 
     strcat(strike.moveATM, ":");
     memcpy(strike.field, field, sizeof(char)*8*8);
     strike.enemyColour[0] = enemyColour[0];
-    strike.enemyColour[1]=enemyColour[1];
+    strike.enemyColour[1] = enemyColour[1];
     strike.ownColour = ownColour;
     strike.bestMove = bestMove;
 
-    
+
     //nach Schlagenden Zuegen suchen
     //links oben
     strike = queenStrike(-1,1,strike);
@@ -211,7 +214,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int 
 
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
-//Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen"; 
+//Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen";
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
   char* ergebnis = malloc(sizeof(char)*64);
@@ -275,7 +278,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
         moveBisher=currentMove.zug;
         goto ZUGBEENDEN;
         }
-    
+
 
 
   ZUGBEENDEN:
@@ -360,7 +363,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
         printField(currentField);
         currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
         moveBisher=currentMove.zug;
-        
+
         goto ZUGBEENDEN;
         }
   //}
