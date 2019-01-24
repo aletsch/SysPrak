@@ -220,11 +220,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   char* ergebnis = malloc(sizeof(char)*64);
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
-  struct moeglicherZug currentMove;
+  struct moeglicherZug currentMove, tempMove;
   if(geschlagen){
     currentMove.gewichtung = bestMove.gewichtung;
+    tempMove.gewichtung = bestMove.gewichtung;
   } else {
     currentMove.gewichtung = -1;
+    tempMove.gewichtung = -1;
   }
 
   //moveBisher  = malloc(sizeof(char)*64);
@@ -240,8 +242,22 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       currentMove = possibleMovesWhite(x-2, y+2, currentMove, 1 , moveBisher, currentField);
-      goto ZUGBEENDEN;
-    } else if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
+      geschlagen = 1;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+     }
+    }
+
+    memcpy(currentField, field, sizeof(char)*8*8);
+    if(geschlagen){
+     tempMove.gewichtung = bestMove.gewichtung;
+    } else {
+     tempMove.gewichtung = -1;
+   }
+
+    if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
       //nach rechts oben schlagen
       currentMove.gewichtung = currentMove.gewichtung + 2;
       currentField[x][y]      = '*';
@@ -249,39 +265,52 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       currentMove = possibleMovesWhite(x+2, y+2, currentMove, 1 , moveBisher, currentField);
-      goto ZUGBEENDEN;
-    } else if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
+      geschlagen = 1;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+     }
+    } else  if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
       strcat(moveBisher, getCoordinate(x-1, y+1));
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      currentMove.gewichtung++;
-      goto ZUGBEENDEN;
+      tempMove.gewichtung++;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+     }
     } else if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       //nach rechts oben bewegen
       strcat(moveBisher, getCoordinate(x+1, y+1));
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
       currentMove.gewichtung++;
-      goto ZUGBEENDEN;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+     }
     }
 
   }
 
     //prepare and start queenMove
-    if(currentField[x][y] == 'W'){
-        char enemyColour[2];
-        enemyColour[0] = 'b';
-        enemyColour[1] = 'B';
-        char ownColour = 'W';
-        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
-        moveBisher=currentMove.zug;
-        goto ZUGBEENDEN;
-        }
+  if(currentField[x][y] == 'W'){
+    char enemyColour[2];
+    enemyColour[0] = 'b';
+    enemyColour[1] = 'B';
+    char ownColour = 'W';
+    currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+    moveBisher=currentMove.zug;
+    //goto ZUGBEENDEN;
+  }
 
 
 
-  ZUGBEENDEN:
+//  ZUGBEENDEN:
     //moveBisher[(strlen(moveBisher)-1)] = "\0";
 
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
@@ -303,11 +332,13 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   char* ergebnis = malloc(sizeof(char)*64);
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
-  struct moeglicherZug currentMove;
+  struct moeglicherZug currentMove, tempMove;
   if(geschlagen){
     currentMove.gewichtung = bestMove.gewichtung;
+    tempMove.gewichtung = bestMove.gewichtung;
   } else {
     currentMove.gewichtung = -1;
+    tempMove.gewichtung = -1;
   }
 
   //moveBisher  = malloc(sizeof(char)*64);
@@ -317,58 +348,91 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
       //nach links unten schlagen
-      currentMove.gewichtung = currentMove.gewichtung + 2;
+      tempMove.gewichtung = tempMove.gewichtung + 2;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesBlack(x-2, y-2, currentMove, 1 , moveBisher, currentField);
-      goto ZUGBEENDEN;
-    } else if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*')){
+      tempMove = possibleMovesBlack(x-2, y-2, tempMove, 1 , moveBisher, currentField);
+      geschlagen = 1;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+       currentMove = tempMove;
+     }
+    }
+
+
+    memcpy(currentField, field, sizeof(char)*8*8);
+    if(geschlagen){
+     tempMove.gewichtung = bestMove.gewichtung;
+    } else {
+     tempMove.gewichtung = -1;
+   }
+
+    if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*')){
       //nach rechts unten schlagen
-      currentMove.gewichtung = currentMove.gewichtung + 2;
+      tempMove.gewichtung = tempMove.gewichtung + 2;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesBlack(x+2, y-2, currentMove, 1 , moveBisher, currentField);
-      goto ZUGBEENDEN;
-    } else if (inBound(x-1, y-1) && (currentField[x-1][y-1] == '*') && (geschlagen == 0)) {
+      tempMove = possibleMovesBlack(x+2, y-2, tempMove, 1 , moveBisher, currentField);
+      geschlagen = 1;
+      //goto ZUGBEENDEN;
+
+      if(tempMove.gewichtung > currentMove.gewichtung){
+         currentMove = tempMove;
+      }
+    }
+
+    memcpy(currentField, field, sizeof(char)*8*8);
+    if(geschlagen){
+      tempMove.gewichtung = bestMove.gewichtung;
+    } else {
+      tempMove.gewichtung = -1;
+    }
+
+    if (inBound(x-1, y-1) && (currentField[x-1][y-1] == '*') && (geschlagen == 0)) {
       //nach links unten bewegen
       strcat(moveBisher, getCoordinate(x-1, y-1));
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      currentMove.gewichtung++;
-      goto ZUGBEENDEN;
-    } else if (inBound(x+1, y-1) && (currentField[x+1][y-1] == '*') && (geschlagen == 0)) {
+      tempMove.gewichtung++;
+      //goto ZUGBEENDEN;
+
+      if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+      }
+    }else if (inBound(x+1, y-1) && (currentField[x+1][y-1] == '*') && (geschlagen == 0)) {
       //nach rechts unten bewegen
       strcat(moveBisher, getCoordinate(x+1, y-1));
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      currentMove.gewichtung++;
-      goto ZUGBEENDEN;
+      tempMove.gewichtung++;
+      //goto ZUGBEENDEN;
+
+     if(tempMove.gewichtung > currentMove.gewichtung){
+        currentMove = tempMove;
+     }
     }
 
   }
 
+  if(currentField[x][y] == 'B'){
+    char enemyColour[2];
+    enemyColour[0] = 'w';
+    enemyColour[1] = 'W';
+    char ownColour = 'B';
+    printField(currentField);
+    currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+    moveBisher=currentMove.zug;
 
-  //else
-  //{
-    //prepare and start queenMove
-    if(currentField[x][y] == 'B'){
-        char enemyColour[2];
-        enemyColour[0] = 'w';
-        enemyColour[1] = 'W';
-        char ownColour = 'B';
-        printField(currentField);
-        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
-        moveBisher=currentMove.zug;
-
-        goto ZUGBEENDEN;
+        //goto ZUGBEENDEN;
         }
   //}
 
-  ZUGBEENDEN:
+ // ZUGBEENDEN:
     //moveBisher[(strlen(moveBisher)-1)] = "\0";
 
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
