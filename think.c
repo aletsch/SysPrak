@@ -6,11 +6,14 @@
 
 #include "main.h"
 
+//gibt 1 bei weißen Stein, -1 bei schwarzen Stein, 0 bei leeren Feld(und andere Sachen die nicht auftreten sollten)
 int getTeam(char spielstein){
   if(spielstein == 'w' || spielstein == 'W'){
-    return 0;
-  } else if(spielstein == 'b' || spielstein == 'B'){
     return 1;
+  } else if(spielstein == 'b' || spielstein == 'B'){
+    return -1;
+  } else {
+    return 0;
   }
 }
 
