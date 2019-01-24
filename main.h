@@ -45,7 +45,7 @@ struct queenData{
   int success; //erfolg 1 (also schlagen) sonst 0
   char moveATM[64];
   char field[8][8];
-  char* enemyColour[2];
+  char enemyColour[2];
   char ownColour;
 };
 

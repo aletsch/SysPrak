@@ -15,6 +15,19 @@ int getTeam(char spielstein){
 }
 
 
+void printField(char field[8][8])
+{
+    for(int i=7; i>=0; i--)
+    {
+        for(int j=0; j<=7; j++)
+        {
+            printf("%c ", field[j][i]);
+        }
+        printf("\n");
+    }
+}
+
+
 char *getCoordinate(int x, int y){
   char* coordinate = malloc(sizeof(char) * 3);
 
@@ -93,169 +106,113 @@ int inBound(int x, int y) {
 
 struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
-    printf("Starte queenStrike");
+    //printf("Starte queenStrike\n");
     struct queenData temp;
     
 
     for (int distance = 1; distance<8; distance ++){
         int xnew = strike.x+(distance*rx);
         int ynew = strike.y+(distance*ry);
-        if(inBound(xnew, ynew))
+        if(inBound(xnew, ynew)&&inBound(xnew+rx,ynew+ry))
         {
-            if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew+rx][ynew+ry] == '*')
+            printField(strike.field);
+            if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*')
                 {
+                    strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry));
+                    strcat(strike.moveATM, ":");
+                    strcpy(strike.bestMove.zug,strike.moveATM);
                     strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
                     strike.field[strike.x][strike.y]      = '*';
                     strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
-                    strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
-                    strcat(strike.moveATM, ":");
-                    strike.x=strike.x+(distance*rx);
-                    strike.y=strike.y+(distance*ry);
+                    strike.x=xnew+rx;
+                    strike.y=ynew+ry;
+                    printField(strike.field);
+                    printf("\n");
                     
-                    //rekursiver Aufruf mit temporärem Feld
-                    temp=queenStrike(rx,ry,strike);
+
+                    //rekursiver Aufruf für Folgeschläge
+                    //links oben
+                    temp=queenStrike(-1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
                         //strike = queenStrike(rx, ry, strike);
                         strike=temp;
                     }
-                    else
+                    /*else
                     {
                         strike.success=1;                    
+                    }*/
+
+
+                    //rechts oben
+                    temp=queenStrike(1,1,strike);
+                    if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                    {
+                        strike=temp;
+                    }
+
+                    //links unten
+                    temp=queenStrike(-1,-1,strike);
+                    if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                    {
+                        strike=temp;
+                    }
+
+                    //rechts unten
+                    temp=queenStrike(-1,-1,strike);
+                    if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
+                    {
+                        strike=temp;
                     }
                     
                 }
-            else
-            {
-                //rechts oben
-                temp=queenStrike(1,1,strike);
-                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
-                {
-                    strike=temp;
-                }
-
-                //links unten
-                temp=queenStrike(-1,-1,strike);
-                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
-                {
-                    strike=temp;
-                }
-
-                //rechts unten
-                temp=queenStrike(1,-1,strike);
-                if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
-                {
-                    strike=temp;
-                }                
+                
             }
-        }
-        else
-        {
-            break;
-        }
     }
+return strike;
 }
 
-/*
-struct queenData queenStrike(int rx, int ry, struct queenData strike){
-  struct queenData temp;
-
-  for (int distance = 1; distance<8; distance ++){
-    int xnew = strike.x+(distance*rx);
-    int ynew = strike.y+(distance*ry);
-    if(inBound(xnew, ynew)){
-      if((strike.field[xnew][ynew] == *strike.enemyColour[1] || strike.field[xnew][ynew] == *strike.enemyColour[2] ) && strike.field[xnew+rx][ynew+ry] == '*'){
-        strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
-        strike.field[strike.x][strike.y]      = '*';
-        strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
-        strike.field[xnew][ynew]  = '*';
-        strcat(strike.moveATM, getCoordinate(xnew+rx,ynew+ry));
-        strcat(strike.moveATM, ":");
-        strike.x=strike.x+(distance*rx);
-        strike.y=strike.y+(distance*ry);
-
-        //rekursiver Aufruf mit temporärem Feld
-        temp=queenStrike(rx,ry,strike);
-          if(temp.success==1){
-          //strike = queenStrike(rx, ry, strike);
-          strike=temp;
-        } else {
-          strike.success=1;
-        }
-      } else {
-        //rechts oben
-        queenStrike(1,1,strike);
-        //links unten
-        queenStrike(-1,-1,strike);
-        //rechts unten
-        queenStrike(1,-1,strike);
-      }
-    } else {
-      break;
-    }
-  }
-    return strike;
-}
-
-*/
 
 
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
 
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char ownColour)
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char enemyColour[2], char ownColour)
 {
-    printf("Start queenMove");
+    printf("Start queenMove\n");
     //create and fill queenData
     struct queenData strike;
-    printf("1\n");
     strike.x = x;
-    printf("2\n");
     strike.y = y;
-    printf("3\n");
     strike.success = 0;
-    printf("4\n");
-    strcpy(strike.moveATM,moveBisher);
-    printf("5\n");
+    strcpy(strike.moveATM, getCoordinate(x,y));
+    strcat(strike.moveATM, ":");
     memcpy(strike.field, field, sizeof(char)*8*8);
-    printf("6\n");
-    memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
-    printf("7\n");
-    strike.ownColour = ownColour;   //, sizeof(char));
-    printf("8\n");
+    strike.enemyColour[0] = enemyColour[0];
+    strike.enemyColour[1]=enemyColour[1];
+    strike.ownColour = ownColour;
     strike.bestMove = bestMove;
 
-    //nach schlagenden zügen Suchen (Anfang links oben)
-
+    
+    //nach Schlagenden Zuegen suchen
+    //links oben
     strike = queenStrike(-1,1,strike);
-    printf("Nach queenStrike");
+    //rechts oben
+    strike = queenStrike(1,1,strike);
+    //links unten
+    strike = queenStrike(-1,-1,strike);
+    //rechts unten
+    strike = queenStrike(1,-1,strike);
+
+    //TODO Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
 
     //release variables
     return strike.bestMove;
 }
-/*
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char* enemyColour[2], char ownColour){
-  //create and fill queenData
-  struct queenData strike;
-  strike.x = x;
-  strike.y = y;
-  strike.success = 0;
-  strcpy(strike.moveATM,moveBisher);
-  memcpy(strike.field, field, sizeof(char)*8*8);
-  memcpy(strike.enemyColour, enemyColour, sizeof(char)*2);
-  strike.ownColour = ownColour;   //, sizeof(char));
-  strike.bestMove = bestMove;
-
-  //nach schlagenden zügen Suchen (Anfang links oben)
-  strike = queenStrike(-1,1,strike);
 
 
-  //release variables
-  return strike.bestMove;
-} 
 
-*/
 
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
@@ -315,11 +272,12 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     //prepare and start queenMove
     if(currentField[x][y] == 'W'){
-        char* enemyColour[2];
-        strcpy(enemyColour[1], "b");
-        strcpy(enemyColour[2], "B");
+        char enemyColour[2];
+        enemyColour[0] = 'b';
+        enemyColour[1] = 'B';
         char ownColour = 'W';
-        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+        moveBisher=currentMove.zug;
         goto ZUGBEENDEN;
         }
     
@@ -400,14 +358,14 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   //{
     //prepare and start queenMove
     if(currentField[x][y] == 'B'){
-        printf("Starte queenMove\n");
-        char* enemyColour[2];
-        strcpy(enemyColour[1], "w");
-        strcpy(enemyColour[2], "W");
+        char enemyColour[2];
+        enemyColour[0] = 'w';
+        enemyColour[1] = 'W';
         char ownColour = 'B';
-        //strcpy(ownColour,"B");
-        printf("Starte queenMove\n");
-        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, field, enemyColour, ownColour);
+        printField(currentField);
+        currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+        moveBisher=currentMove.zug;
+        
         goto ZUGBEENDEN;
         }
   //}
@@ -464,7 +422,7 @@ char* think() {
       for(int x=0; x<8; x++) {
         for (int y=7; y>=0; y--) {
           spielStein = spieldaten->field[x][y];
-          printf("Spielstein: %c\n", spielStein);
+          //printf("Spielstein: %c\n", spielStein);
           if (spielStein == 'b' || spielStein == 'B') {
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
