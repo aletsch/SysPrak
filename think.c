@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/shm.h>
-
 #include "main.h"
 
 //gibt 1 bei weißen Stein, -1 bei schwarzen Stein, 0 bei leeren Feld(und andere Sachen die nicht auftreten sollten)
@@ -284,6 +278,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       
     }
   }*/
+  return gewichtung;
 }
 
 

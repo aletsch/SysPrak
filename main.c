@@ -1,24 +1,5 @@
-//#define GAMEKINDNAME "Checkers"
-//#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
-//#define PORTNUMBER 1357
-
-//Bibliotheken einbinden
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <signal.h>
-
-//weitere Programmteile einbinden
-#include "performConnection.c"
-#include "conf.c"
-#include "communication.c"
+//Bibliotheken und header einbinden
 #include "main.h"
-#include "think.c"
 
 
 // struct Spieldaten {
