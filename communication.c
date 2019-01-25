@@ -141,8 +141,8 @@ int communication(int *socket, int pipe){
         } else {
           printf("You lose\n");
         }
-        shmdt(spieldaten);
         kill(spieldaten -> thinker, SIGTERM);
+        shmdt(spieldaten);
         return 0;
       } else if(strcmp(ptr, "MOVE") == 0){
         //macht einfach gar nichts, weil wir nicht wissen ob wir neu lesen müssen, vielleicht Zeit für Spielzug rausnehmen(falls wir den thinker optimieren wollen)
@@ -185,8 +185,8 @@ int communication(int *socket, int pipe){
 
       } else {
         printf("wtf was that\n%s\n", ptr);
-        shmdt(spieldaten);
         kill(spieldaten -> thinker, SIGTERM);
+        shmdt(spieldaten);
         return -1;
   }
 
