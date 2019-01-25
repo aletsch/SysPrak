@@ -316,7 +316,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry));
                     strcat(strike.moveATM, ":");
                     strcpy(strike.bestMove.zug,strike.moveATM);
-                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 2;
+                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 1000;
                     strike.field[strike.x][strike.y]      = '*';
                     strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
