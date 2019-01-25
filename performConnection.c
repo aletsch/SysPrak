@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #include "main.h"
 //#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de\n"
@@ -46,6 +47,11 @@ int hostname_to_ip(char* host, char *ip){
 
 int readServer(int *socket, char *buffer){
 
+  int shmID;
+  struct Spieldaten *spieldaten;
+  shmID = shmget(KEY, SHMSIZE, 0666);
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+
   memset(buffer, 0, BUF);
 
   if(read(*socket, buffer, BUF) != 0){
@@ -56,11 +62,14 @@ int readServer(int *socket, char *buffer){
         break;
       case '-':
         printf("Ungültige Serveranfrage: %s", buffer);
+        //printf("PID thinker %i\nPID connector %i\n", spieldaten->thinker, spieldaten->connector);
+        kill(spieldaten -> thinker, SIGTERM);
+        //kill(spieldaten -> connector, SIGTERM);
         exit(EXIT_FAILURE);
-        break;
       default:
         printf("%s\n", buffer);
         printf("Unerwartete Antwort des Servers\n");
+        kill(spieldaten -> thinker, SIGTERM);
         exit(EXIT_FAILURE);
     }
     } else {

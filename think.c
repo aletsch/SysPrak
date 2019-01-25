@@ -26,6 +26,41 @@ void printField(char field[8][8])
         printf("\n");
     }
 }
+//berechnet die Gewichtung für die Position auf die man ziehen will und gibt diese zurück
+// x,y der Position, das aktuelle Feld 
+int getWeight(int x, int y, char field[8][8], char enemy[2], int colour)
+{
+  //check for all 4 directions in distance 1 for enemy token
+  //left top
+  
+  
+/*
+  //colour of the own token/player colour
+  int weight = 0;
+  //direction in which to check -1 for 
+  int direction = 0;
+  if(field[x][y] == 'b' || field[x][y] == 'w')
+  {
+    //determine the colour
+    if(field[x][y] == 'b')
+      {
+        colour = 'b';
+        direction=-1;
+      }
+    if(field[x][y] == 'w')
+      {
+        colour = 'w';
+        direction=1;
+      }
+    
+    //check for enemy strikes
+    //enemy token on the left
+    if(inBound(x+direction, y-1) && field[x+direction][y-1])
+    {
+      
+    }
+  }*/
+}
 
 
 char *getCoordinate(int x, int y){
@@ -108,6 +143,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
     //printf("Starte queenStrike\n");
     struct queenData temp;
+    printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
 
 
     for (int distance = 1; distance<8; distance ++){
@@ -116,10 +152,13 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
         if (strike.field[xnew][ynew] != '*' && (strike.field[xnew][ynew] != strike.enemyColour[0] &&strike.field[xnew][ynew] != strike.enemyColour[1])) {
           break;
         }
+        //zu schlagendes und neues Feld noch innerhalb des Feldes
         if(inBound(xnew, ynew) && inBound(xnew+rx,ynew+ry))
         {
             printField(strike.field);
-            if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*')
+            printf("\n");
+            //ist das zu schlagende Feld ein gegnerisches, dahinter frei und das Feld davor frei oder die eigene Figur
+            if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*' && (strike.field[xnew-rx][ynew-ry] == strike.ownColour || strike.field[xnew-rx][ynew-ry] == '*'))
                 {
                     strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry));
                     strcat(strike.moveATM, ":");
@@ -176,7 +215,7 @@ return strike;
 //enemy Colour 1 klein Buchstabe enemy Colour 2 Gossbuchstabe
 //ownColour muss in Grossbuchstabe sein
 
-struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8], char enemyColour[2], char ownColour)
+struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char field[8][8], char enemyColour[2], char ownColour)
 {
     printf("Start queenMove\n");
     //create and fill queenData
@@ -203,7 +242,44 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, int 
     //rechts unten
     strike = queenStrike(1,-1,strike);
 
-    //TODO Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
+    //Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
+    //eins nach links oben gehen +1
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y+1))
+    {
+      strcat(strike.moveATM, getCoordinate(x-1,y+1));
+      strcat(strike.moveATM, ":");
+      strcpy(strike.bestMove.zug, strike.moveATM);
+      strike.bestMove.gewichtung = 0;
+    }
+    
+    //eins nach rechts oben gehen
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1))
+    {
+      strcat(strike.moveATM, getCoordinate(x+1,y+1));
+      strcat(strike.moveATM, ":");
+      strcpy(strike.bestMove.zug, strike.moveATM);
+      strike.bestMove.gewichtung = 0;
+    }
+    
+    
+    //eins nach links unten gehen
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1))
+    {
+      strcat(strike.moveATM, getCoordinate(x-1,y-1));
+      strcat(strike.moveATM, ":");
+      strcpy(strike.bestMove.zug, strike.moveATM);
+      strike.bestMove.gewichtung = 0;
+    }
+    
+    
+    //eins nach rechtsunten gehen
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1))
+    {
+      strcat(strike.moveATM, getCoordinate(x+1,y-1));
+      strcat(strike.moveATM, ":");
+      strcpy(strike.bestMove.zug, strike.moveATM);
+      strike.bestMove.gewichtung = 0;
+    }
 
     //release variables
     return strike.bestMove;
@@ -303,7 +379,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     enemyColour[0] = 'b';
     enemyColour[1] = 'B';
     char ownColour = 'W';
-    currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+    currentMove=queenMove(x, y, bestMove, currentField, enemyColour, ownColour);
     moveBisher=currentMove.zug;
     //goto ZUGBEENDEN;
   }
@@ -425,7 +501,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     enemyColour[1] = 'W';
     char ownColour = 'B';
     printField(currentField);
-    currentMove=queenMove(x, y, bestMove, geschlagen, moveBisher, currentField, enemyColour, ownColour);
+    currentMove=queenMove(x, y, bestMove, currentField, enemyColour, ownColour);
     moveBisher=currentMove.zug;
 
         //goto ZUGBEENDEN;
