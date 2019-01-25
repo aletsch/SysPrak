@@ -62,6 +62,8 @@ void signalHandler(int signal) {
 
 void signalTerm(int signal){
   signal = signal +1;   //damit das makefile nicht meckert
+  int shmID = shmget(KEY, SHMSIZE, 0666);
+  shmctl(shmID, IPC_RMID, NULL);
   exit(EXIT_SUCCESS);
 }
 
@@ -181,6 +183,7 @@ int main(int argc,char** argv){
 
     signal(SIGUSR1, signalHandler);
     signal(SIGTERM, signalTerm);
+    shmdt(spieldaten);
 
     //strcpy(finalMove, "A3:B4\n");
     //write(fd[1], finalMove, strlen(finalMove));

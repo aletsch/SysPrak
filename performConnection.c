@@ -69,11 +69,13 @@ int readServer(int *socket, char *buffer){
       default:
         printf("%s\n", buffer);
         printf("Unerwartete Antwort des Servers\n");
+        shmdt(spieldaten);
         kill(spieldaten -> thinker, SIGTERM);
         exit(EXIT_FAILURE);
     }
     } else {
     perror("Fehler beim Lesen vom Server: ");
+    shmdt(spieldaten);
     return -1;
     }
 }

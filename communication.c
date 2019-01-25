@@ -19,6 +19,7 @@ void printBoard(){
     }
     printf("\n");
   }
+  shmdt(spieldaten);
 }
 
 int updateBoard(char* board){
@@ -140,6 +141,7 @@ int communication(int *socket, int pipe){
         } else {
           printf("You lose\n");
         }
+        shmdt(spieldaten);
         kill(spieldaten -> thinker, SIGTERM);
         return 0;
       } else if(strcmp(ptr, "MOVE") == 0){
@@ -183,6 +185,8 @@ int communication(int *socket, int pipe){
 
       } else {
         printf("wtf was that\n%s\n", ptr);
+        shmdt(spieldaten);
+        kill(spieldaten -> thinker, SIGTERM);
         return -1;
   }
 
@@ -191,6 +195,5 @@ int communication(int *socket, int pipe){
       curLine = nextLine ? (nextLine+1) : NULL;
     }while(*curLine);
   }
-  return 0;
 }
 

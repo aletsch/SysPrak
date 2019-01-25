@@ -680,9 +680,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
 char* think() {
 
-  int shmID;
   struct Spieldaten *spieldaten;
-  shmID = shmget(KEY, SHMSIZE, 0666);
+  int shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   char* ergebnis = malloc(sizeof(char)*64);
 
@@ -728,5 +727,6 @@ char* think() {
 
   strcpy(ergebnis, spielzug.zug);
   printf("thinker sagt%s \n", ergebnis);
+  shmdt(spieldaten);
   return ergebnis;
 }
