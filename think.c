@@ -18,54 +18,6 @@ int getTeam(char spielstein){
 }
 
 
-void printField(char field[8][8])
-{
-    for(int i=7; i>=0; i--)
-    {
-        for(int j=0; j<=7; j++)
-        {
-            printf("%c ", field[j][i]);
-        }
-        printf("\n");
-    }
-}
-//berechnet die Gewichtung für die Position auf die man ziehen will und gibt diese zurück
-// x,y der Position, das aktuelle Feld 
-int getWeight(int x, int y, char field[8][8], char enemy[2], int colour)
-{
-  //check for all 4 directions in distance 1 for enemy token
-  //left top
-  
-  
-/*
-  //colour of the own token/player colour
-  int weight = 0;
-  //direction in which to check -1 for 
-  int direction = 0;
-  if(field[x][y] == 'b' || field[x][y] == 'w')
-  {
-    //determine the colour
-    if(field[x][y] == 'b')
-      {
-        colour = 'b';
-        direction=-1;
-      }
-    if(field[x][y] == 'w')
-      {
-        colour = 'w';
-        direction=1;
-      }
-    
-    //check for enemy strikes
-    //enemy token on the left
-    if(inBound(x+direction, y-1) && field[x+direction][y-1])
-    {
-      
-    }
-  }*/
-}
-
-
 char *getCoordinate(int x, int y){
   char* coordinate = malloc(sizeof(char) * 3);
 
@@ -134,6 +86,204 @@ int inBound(int x, int y) {
   } else {
     return 0;
   }
+}
+
+
+//gibt ein Array mit den beiden gegnerischen Spielsteinen zurück
+char * getEnemy (char spielstein)
+{
+char *ergebnis = (char *) malloc(sizeof(char)*2);
+
+  if(spielstein == 'w' || spielstein == 'W'){
+    ergebnis[0] = 'b';
+    ergebnis[1] = 'B';
+  } else if(spielstein == 'b' || spielstein == 'B'){
+    ergebnis[0] = 'w';
+    ergebnis[1] = 'W';
+  } else {
+    ergebnis[0] = '*';
+    ergebnis[1] = '*';
+  }
+return ergebnis;
+}
+
+
+void printField(char field[8][8])
+{
+    for(int i=7; i>=0; i--)
+    {
+        for(int j=0; j<=7; j++)
+        {
+            printf("%c ", field[j][i]);
+        }
+        printf("\n");
+    }
+}
+//überprüft nach Feinden in gegebene Richtung(rx,ry) an Position (x,y) und gibt bei gefunden einen Gewichung zurück
+//bei gefundenem Fein return 1 sonst 0
+int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
+{
+  int ergebnis;
+  char* enemy[2];
+  memcpy(enemy,getEnemy,sizeof(char)*2);
+
+  //check Bauer
+  if(field[x+rx][y+ry]==*enemy[0])
+    {ergebnis = 1;}
+
+  //check Dame
+  else
+  {
+    for (int distance = 1; distance<8; distance ++){
+      int xnew = x+(distance*rx);
+      int ynew = y+(distance*ry);
+      
+      if(inBound(xnew,ynew))
+      {
+        if(field[xnew][ynew]==*enemy[1])
+          {ergebnis = 1;}
+      }
+      else
+        {break;}
+    }
+  }
+return ergebnis;
+}
+
+
+//überprüft, ob der Stein an der Stelle (x,y) aus der Richtung (rx,ry) geschlagen werden kann
+int strikeable(int rx, int ry, int x, int y, char field [8][8])
+{
+  int strikeable = 0;
+
+  if(inBound(x+(-1*rx),y+(-1*ry)) && field[x+(-1*rx)][y+(-1*ry)]=='*')
+    {strikeable=1;}
+
+  return strikeable;
+}
+
+
+
+//berechnet die Gewichtung für die Position(x,y) auf die man ziehen will und gibt diese zurück
+// x,y der Position, das aktuelle Feld, Farbe des aktuell ziehenden Steins (wichtig, ob Dame oder Bauer!)
+int getWeight(int x, int y, char field[8][8], char colour)
+{
+  //Wertungen
+  int strike = -100;
+  int lastRow = -20;
+  int crown = 50;
+
+  int gewichtung = 0;
+  char* enemy[2];
+  memcpy(enemy,getEnemy,sizeof(char)*2);
+  //überprüfe alle 4 Richtungen nach gegnerischen Steinen und ob sie schlagen können, falls ja erfolgt eine Abwertung
+  
+  //links oben
+  //Feind ja
+  if(checkEnemy(-1,1,x,y,field))
+  {
+    //schlagbar ja -> Abwertung
+    if(strikeable(-1,1,x,y,field))
+    {
+      gewichtung+=strike;
+    }
+  }
+  
+  //rechts oben
+  if(checkEnemy(1,1,x,y,field))
+  {
+    if(strikeable(1,1,x,y,field))
+    {
+      gewichtung+=strike;
+    }
+  }
+  
+  // links unten
+  if(checkEnemy(-1,-1,x,y,field))
+  {
+    if(strikeable(-1,-1,x,y,field))
+    {
+      gewichtung+=strike;
+    }
+  }
+  
+  //rechts unten
+  if(checkEnemy(1,-1,x,y,field))
+  {
+    if(strikeable(1,-1,x,y,field))
+    {
+      gewichtung+=strike;
+    }
+  }
+  
+  
+  // Abwertung bei verlassen der letzten Reihe
+  //???? aktuell nur für Bauern! (weiß nicht ob auch für Dame sinnvoll)
+  if(colour=='b'||colour=='B')
+  {
+    if( y == 7 && colour =='b')
+    {
+      gewichtung+=lastRow;
+    }
+  }
+  else if(colour=='w'||colour=='W')
+  {
+    if( y == 0 && colour =='w')
+    {
+      gewichtung+=lastRow;
+    }
+  }
+  
+  // Aufwertung, wenn Bauer gekrönt wird
+  if(colour=='b' && y==0)
+  {
+    gewichtung+=crown;
+  }
+  else if(colour=='w'&& y==7)
+  {
+    gewichtung+=crown;
+  }
+  
+  
+  
+  //TODO Aufwertung wenn der Zug in die Mittelzone geht  
+  
+  //TODO evtl Aufwertung, für eigene Steine in der nähe, aber durch die strikeable Abfrage evtl redundant
+  
+  
+  //gewichtung += checkEnemy(-1,1,x,y,field);
+  //gewichtung += strikeable(-1,1,x,y,field);
+  
+  //rechts oben
+  //gewichtung += checkEnemy(1,1,x,y,field);
+  
+  
+/*
+  //colour of the own token/player colour
+  int weight = 0;
+  //direction in which to check -1 for 
+  int direction = 0;
+  if(field[x][y] == 'b' || field[x][y] == 'w')
+  {
+    //determine the colour
+    if(field[x][y] == 'b')
+      {
+        colour = 'b';
+        direction=-1;
+      }
+    if(field[x][y] == 'w')
+      {
+        colour = 'w';
+        direction=1;
+      }
+    
+    //check for enemy strikes
+    //enemy token on the left
+    if(inBound(x+direction, y-1) && field[x+direction][y-1])
+    {
+      
+    }
+  }*/
 }
 
 
