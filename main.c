@@ -52,19 +52,19 @@ void signalHandler(int signal) {
   signal = signal +1;   //damit das makefile nicht meckert
 
   printBoard();
+  spieldaten->thinkFlag = 1;
 
-  char finalMove[64] = "";
-
-  strcpy(finalMove, think());
-  write(spieldaten->fdWrite, think(), strlen(finalMove));
-
+  shmdt(spieldaten);
 }
 
 void signalTerm(int signal){
   signal = signal +1;   //damit das makefile nicht meckert
   int shmID = shmget(KEY, SHMSIZE, 0666);
+  struct Spieldaten *spieldaten;
+  spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   shmctl(shmID, IPC_RMID, NULL);
-  exit(EXIT_SUCCESS);
+  spieldaten->thinkFlag = -1;
+  shmdt(spieldaten);
 }
 
 
@@ -133,6 +133,8 @@ int main(int argc,char** argv){
   strcpy(spieldaten -> gameName, configStruct.gamekind);
   spieldaten -> playerNumber = atoi(player);
 
+  spieldaten -> thinkFlag = 0;
+
 
   //test
   // spieldaten.playerNumber =  atoi(player);
@@ -164,12 +166,13 @@ int main(int argc,char** argv){
     performConnection(gid, player, configStruct.gamekind, sock);
 
     communication(sock, fd[0]);
-
+    shmdt(spieldaten);
 
     //close connection
     close(*sock);
 
     close(fd[0]);
+    return 0;
   } else {
     //Hier beginnt der Thinker = ElternProzess
     spieldaten -> thinker = getpid();
@@ -177,22 +180,28 @@ int main(int argc,char** argv){
 
     //Schließen der Leseseite
     close(fd[0]);
-    spieldaten->fdWrite = fd[1];
 
     //char finalMove[64];
 
     signal(SIGUSR1, signalHandler);
     signal(SIGTERM, signalTerm);
-    shmdt(spieldaten);
 
     //strcpy(finalMove, "A3:B4\n");
     //write(fd[1], finalMove, strlen(finalMove));
     //memset(finalMove, 0, 64);
 
-    while(1){     
+    while(spieldaten->thinkFlag != -1){     
+      if(spieldaten->thinkFlag){
+        spieldaten->thinkFlag = 0;
+        char finalMove[64] = "";
+
+        strcpy(finalMove, think());
+        write(fd[1], finalMove, strlen(finalMove));
+      }  
       sleep(1);
     }
 
+    shmdt(spieldaten);
     close(fd[1]);
   }
 
