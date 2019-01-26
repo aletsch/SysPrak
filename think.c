@@ -676,7 +676,6 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 char* think() {
 
   struct Spieldaten *spieldaten;
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   char* ergebnis = malloc(sizeof(char)*64);
 

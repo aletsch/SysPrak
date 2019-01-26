@@ -28,6 +28,8 @@
 extern void error(char message[BUF]);
 extern void signalHandler(int signal);
 
+extern int shmID;
+
 void printBoard();
 struct Configuration setConfig(char* file);
 int connectToServer(int* sock, char* host, int port);

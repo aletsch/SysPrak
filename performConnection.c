@@ -40,9 +40,7 @@ int hostname_to_ip(char* host, char *ip){
 
 int readServer(int *socket, char *buffer){
 
-  int shmID;
   struct Spieldaten *spieldaten;
-  shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
   memset(buffer, 0, BUF);

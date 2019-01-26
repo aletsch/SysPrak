@@ -12,6 +12,8 @@
 //
 // } spieldaten;
 
+int shmID;
+
 void error(char message[BUF])
 {
     printf("Error: %s\n", message);
@@ -26,7 +28,6 @@ void printHilfe(){
 
 void signalHandler(int signal) {
   
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
@@ -39,8 +40,8 @@ void signalHandler(int signal) {
 }
 
 void signalTerm(int signal){
+
   signal = signal +1;   //damit das makefile nicht meckert
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   shmctl(shmID, IPC_RMID, NULL);
@@ -103,9 +104,8 @@ int main(int argc,char** argv){
   struct Configuration configStruct = setConfig(config);
 
   //create the shared memory
-  int shmID;
   //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-  shmID = shmget(KEY, SHMSIZE ,IPC_CREAT | 0666);
+  shmID = shmget(IPC_PRIVATE, SHMSIZE ,IPC_CREAT | 0666);
 
   //attach shared memory to processes
   struct Spieldaten *spieldaten;
@@ -115,12 +115,6 @@ int main(int argc,char** argv){
   spieldaten -> playerNumber = atoi(player);
 
   spieldaten -> thinkFlag = 0;
-
-
-  //test
-  // spieldaten.playerNumber =  atoi(player);
-  // printf("Player im SHM: %i\n", spieldaten.playerNumber);
-  // printf("SHM-ID: %i\n", shmID);
 
   //Erstellen der Pipe
 	int fd[2];
