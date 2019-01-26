@@ -392,7 +392,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
 
     //Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
     //eins nach links oben gehen +1
-    if(strike.bestMove.gewichtung<0 && inBound(x-1,y+1))
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y+1) && field[x-1][y+1] == '*')
     {
       strcat(strike.moveATM, getCoordinate(x-1,y+1));
       strcat(strike.moveATM, ":");
@@ -401,7 +401,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
     }
     
     //eins nach rechts oben gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1))
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1) && field[x+1][y+1] == '*')
     {
       strcat(strike.moveATM, getCoordinate(x+1,y+1));
       strcat(strike.moveATM, ":");
@@ -411,7 +411,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
     
     
     //eins nach links unten gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1))
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1) && field[x-1][y-1] == '*')
     {
       strcat(strike.moveATM, getCoordinate(x-1,y-1));
       strcat(strike.moveATM, ":");
@@ -421,7 +421,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
     
     
     //eins nach rechtsunten gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1))
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1) && field[x+1][y-1] == '*')
     {
       strcat(strike.moveATM, getCoordinate(x+1,y-1));
       strcat(strike.moveATM, ":");
