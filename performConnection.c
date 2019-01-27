@@ -25,7 +25,7 @@ int hostname_to_ip(char* host, char *ip){
 
   if((rv = getaddrinfo(host, "http", &hints, &servinfo))){
     printf("could not resolve addressinfo\n");
-    return 1;
+    return -1;
   }
 
   //take the first possible result
@@ -54,21 +54,22 @@ int readServer(int *socket, char *buffer){
       case '-':
         printf("Ungültige Serveranfrage: %s", buffer);
         //printf("PID thinker %i\nPID connector %i\n", spieldaten->thinker, spieldaten->connector);
-        kill(spieldaten -> thinker, SIGTERM);
-        //kill(spieldaten -> connector, SIGTERM);
-        exit(EXIT_FAILURE);
+        //kill(spieldaten -> thinker, SIGTERM);
+        shmdt(spieldaten);
+        return -1;
       default:
         printf("%s\n", buffer);
         printf("Unerwartete Antwort des Servers\n");
         shmdt(spieldaten);
-        kill(spieldaten -> thinker, SIGTERM);
-        exit(EXIT_FAILURE);
+        //kill(spieldaten -> thinker, SIGTERM);
+        return -1;
     }
-    } else {
+  } else {
     perror("Fehler beim Lesen vom Server: ");
+    //kill(spieldaten -> thinker, SIGTERM);
     shmdt(spieldaten);
     return -1;
-    }
+  }
 }
 
 int writeServer(int *socket, char *buffer, char message[BUF]){
@@ -79,7 +80,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
 
   if(write(*socket, buffer, strlen(buffer)) != 0){
     printf("Client: %s", buffer);
-  return 0;
+    return 0;
   }
   return -1;
 }
@@ -88,8 +89,8 @@ int connectToServer(int* sock, char* host, int port){
   //get ip
   char *ip = malloc(60*sizeof(char));
   char *hostname = host;
-  if (hostname_to_ip(hostname, ip) == 1){
-    return 1;
+  if (hostname_to_ip(hostname, ip) == -1){
+    return -1;
   }
 
 
@@ -118,47 +119,63 @@ int performConnection(char* gameID, char* player, char* gamekind, int* sock){
   char buffer[BUF] = "";
 
   //get Server version
-  readServer(sock, buffer);
-
+  if(readServer(sock, buffer) == -1)
+    return -1;
 
   //send Client Version
-  writeServer(sock, buffer, "VERSION 2.0\n");
+  if(writeServer(sock, buffer, "VERSION 2.0\n") == -1)
+    return -1;
 
 
   //Version accepted, request gameID
-  readServer(sock, buffer);
+  if(readServer(sock, buffer) == -1)
+    return -1;
 
   //send gameID
   char* temp = malloc(BUF);
   strcpy(temp, "ID ");
   strcat(temp, gameID);
   strcat(temp, "\n");
-  writeServer(sock, buffer, temp);
+  if(writeServer(sock, buffer, temp) == -1){
+    free(temp);
+    return -1;
+}
 
 
 
   //Playing Checkers
-  readServer(sock, buffer);
+  if(readServer(sock, buffer) == -1){
+    free(temp);
+    return -1;
+  }
   char *ptr;
   ptr = strtok(buffer, " +");
   ptr = strtok(NULL, " +\n");
   if(strcmp(ptr, gamekind) != 0){
     printf("wrong gamekind");
-    exit(EXIT_FAILURE);
+    free(temp);
+    return -1;
   }
 
   //Game Name
-  readServer(sock, buffer);
+  if(readServer(sock, buffer) == -1){
+    free(temp);
+    return -1;
+  }
 
   //gewünschte Mitsplielernummer
   strcpy(temp, "PLAYER ");
   strcat(temp, player);
   strcat(temp, "\n");
-  writeServer(sock, buffer, temp);
+  if(writeServer(sock, buffer, temp) == -1){
+    free(temp);
+    return -1;
+  }
   free(temp);
 
   //Mitspielerantwort: YOU...
-  readServer(sock, buffer);
+  if(readServer(sock, buffer) == -1)
+    return -1;
 
   //THINKING schicken, damit communication eine Nachricht erhält, die es verarbeiten kann
   // if(atoi(player) == 0){

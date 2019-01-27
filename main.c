@@ -120,11 +120,13 @@ int main(int argc,char** argv){
 	int fd[2];
 	if (pipe(fd) < 0) {
 		error("Fehler beim Erstellen der pipe");
+    return -1;
 	}
 
 	pid_t pid = fork();
 	if (pid<0) {
 		error("Fehler beim Gabeln der Prozesse");
+    return -1;
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
@@ -137,8 +139,17 @@ int main(int argc,char** argv){
     int *sock;
     sock = (int *)malloc(4*sizeof(int));
     *sock = socket(AF_INET, SOCK_STREAM, 0);
-    connectToServer(sock, configStruct.hostname, configStruct.portnumber);
-    performConnection(gid, player, configStruct.gamekind, sock);
+    if(connectToServer(sock, configStruct.hostname, configStruct.portnumber) == -1){
+      free(sock);
+      return -1;
+    }
+    if(performConnection(gid, player, configStruct.gamekind, sock) == -1){
+      kill(spieldaten -> thinker, SIGTERM);
+      close(*sock);
+      free(sock);
+      shmdt(spieldaten);
+      return -1;
+    }
 
     communication(sock, fd[0]);
     shmdt(spieldaten);
