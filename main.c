@@ -145,6 +145,7 @@ int main(int argc,char** argv){
 
     //close connection
     close(*sock);
+    free(sock);
 
     close(fd[0]);
     return 0;
@@ -171,6 +172,7 @@ int main(int argc,char** argv){
         char* finalMove = think();
 
         write(fd[1], finalMove, strlen(finalMove));
+        free(finalMove);
       }  
       sleep(1);
     }
