@@ -86,8 +86,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
 
 int connectToServer(int* sock, char* host, int port){
   //get ip
-  char *ip;
-  ip = (char *)malloc(60*sizeof(char));
+  char *ip = malloc(60*sizeof(char));
   char *hostname = host;
   if (hostname_to_ip(hostname, ip) == 1){
     return 1;
@@ -104,9 +103,11 @@ int connectToServer(int* sock, char* host, int port){
   int connection_status = connect(*sock, (struct sockaddr *) &server_address, sizeof(server_address));
   if (connection_status != 0){
     perror("Error: ");
+    free(ip);
     return -1;
   }
 
+  free(ip);
   return 0;
 }
 

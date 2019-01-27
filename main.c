@@ -168,9 +168,8 @@ int main(int argc,char** argv){
     while(spieldaten->thinkFlag != -1){     
       if(spieldaten->thinkFlag){
         spieldaten->thinkFlag = 0;
-        char finalMove[64] = "";
+        char* finalMove = think();
 
-        strcpy(finalMove, think());
         write(fd[1], finalMove, strlen(finalMove));
       }  
       sleep(1);

@@ -14,6 +14,7 @@ int getTeam(char spielstein){
 
 char *getCoordinate(int x, int y){
   char* coordinate = malloc(sizeof(char) * 3);
+  strcpy(coordinate, "");
 
   switch(x){
     case 0:
@@ -118,11 +119,11 @@ void printField(char field[8][8])
 int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
 {
   int ergebnis;
-  char* enemy[2];
-  memcpy(enemy,getEnemy,sizeof(char)*2);
+  char* enemy = getEnemy(field[x][y]);
+  //memcpy(enemy,getEnemy,sizeof(char)*2);
 
   //check Bauer
-  if(field[x+rx][y+ry]==*enemy[0])
+  if(field[x+rx][y+ry] == enemy[0])
     {ergebnis = 1;}
 
   //check Dame
@@ -134,14 +135,16 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
       
       if(inBound(xnew,ynew))
       {
-        if(field[xnew][ynew]==*enemy[1])
+        if(field[xnew][ynew]== enemy[1])
           {ergebnis = 1;}
       }
       else
         {break;}
     }
   }
-return ergebnis;
+
+  free(enemy);
+  return ergebnis;
 }
 
 
@@ -442,6 +445,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -456,6 +460,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   //moveBisher  = malloc(sizeof(char)*64);
   strcat(moveBisher, getCoordinate(x,y));         //concate move
   strcat(moveBisher, ":");
+
+  strcpy(currentMove.zug, moveBisher);
+  strcpy(tempMove.zug, moveBisher);
   //pawn move
   if (currentField[x][y] == 'w') {
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
@@ -540,6 +547,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(ergebnis);
     //printf("momentaner Zug: %s", currentMove.zug);
     //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
@@ -554,6 +562,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   printf("Start possibleMovesBlack\n");
 
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -568,6 +577,10 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   //moveBisher  = malloc(sizeof(char)*64);
   strcat(moveBisher, getCoordinate(x,y));         //concate move
   strcat(moveBisher, ":");
+
+  strcpy(currentMove.zug, moveBisher);
+  strcpy(tempMove.zug, moveBisher);
+
   //pawn move
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
@@ -662,6 +675,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(ergebnis);
     //printf("momentaner Zug: %s", currentMove.zug);
     //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
@@ -678,6 +692,7 @@ char* think() {
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");

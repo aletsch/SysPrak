@@ -51,9 +51,9 @@ struct Spieldaten {
 };
 
 struct Configuration{
-  char hostname[64];
+  char hostname[BUF];
   int portnumber;
-  char gamekind[64];
+  char gamekind[BUF];
 };
 
 struct moeglicherZug{
