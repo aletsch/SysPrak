@@ -243,8 +243,8 @@ int getWeight(int x, int y, char field[8][8], char colour)
 
   //TODO Aufwertung wenn der Zug in die Mittelzone geht
     //überprüft den abstand von der Ziel-Koordinate zu E5
-  gewichtung += (4 - abs(5-y));
-  gewichtung += (4 - abs(5-x));
+  gewichtung += (4 - abs(4-y));
+  gewichtung += (4 - abs(4-x));
 
 
   //TODO evtl Aufwertung, für eigene Steine in der nähe, aber durch die strikeable Abfrage evtl redundant
