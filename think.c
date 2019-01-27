@@ -130,7 +130,7 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
     for (int distance = 1; distance<8; distance ++){
       int xnew = x+(distance*rx);
       int ynew = y+(distance*ry);
-      
+
       if(inBound(xnew,ynew))
       {
         if(field[xnew][ynew]== enemy[1])
@@ -172,7 +172,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
   char* enemy[2];
   memcpy(enemy,getEnemy,sizeof(char)*2);
   //überprüfe alle 4 Richtungen nach gegnerischen Steinen und ob sie schlagen können, falls ja erfolgt eine Abwertung
-  
+
   //links oben
   //Feind ja
   if(checkEnemy(-1,1,x,y,field))
@@ -183,7 +183,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   //rechts oben
   if(checkEnemy(1,1,x,y,field))
   {
@@ -192,7 +192,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   // links unten
   if(checkEnemy(-1,-1,x,y,field))
   {
@@ -201,7 +201,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   //rechts unten
   if(checkEnemy(1,-1,x,y,field))
   {
@@ -210,8 +210,8 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
-  
+
+
   // Abwertung bei verlassen der letzten Reihe
   //???? aktuell nur für Bauern! (weiß nicht ob auch für Dame sinnvoll)
   if(colour=='b'||colour=='B')
@@ -228,7 +228,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=lastRow;
     }
   }
-  
+
   // Aufwertung, wenn Bauer gekrönt wird
   if(colour=='b' && y==0)
   {
@@ -238,25 +238,29 @@ int getWeight(int x, int y, char field[8][8], char colour)
   {
     gewichtung+=crown;
   }
-  
-  
-  
-  //TODO Aufwertung wenn der Zug in die Mittelzone geht  
-  
+
+
+
+  //TODO Aufwertung wenn der Zug in die Mittelzone geht
+    //überprüft den abstand von der Ziel-Koordinate zu E5
+  gewichtung += (4 - abs(5-y));
+  gewichtung += (4 - abs(5-x));
+
+
   //TODO evtl Aufwertung, für eigene Steine in der nähe, aber durch die strikeable Abfrage evtl redundant
-  
-  
+
+
   //gewichtung += checkEnemy(-1,1,x,y,field);
   //gewichtung += strikeable(-1,1,x,y,field);
-  
+
   //rechts oben
   //gewichtung += checkEnemy(1,1,x,y,field);
-  
-  
+
+
 /*
   //colour of the own token/player colour
   int weight = 0;
-  //direction in which to check -1 for 
+  //direction in which to check -1 for
   int direction = 0;
   if(field[x][y] == 'b' || field[x][y] == 'w')
   {
@@ -271,15 +275,20 @@ int getWeight(int x, int y, char field[8][8], char colour)
         colour = 'w';
         direction=1;
       }
-    
+
     //check for enemy strikes
     //enemy token on the left
     if(inBound(x+direction, y-1) && field[x+direction][y-1])
     {
-      
+
     }
   }*/
-  return gewichtung;
+  if (gewichtung < 0) {
+    return 0;
+  } else {
+    return gewichtung;
+  }
+
 }
 
 
@@ -373,7 +382,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
 
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
-    
+
     printf("Start queenMove\n");
     //create and fill queenData
     struct queenData strike;
@@ -408,7 +417,7 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
+
     //eins nach rechts oben gehen
     if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1) && field[x+1][y+1] == '*')
     {
@@ -417,8 +426,8 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
-    
+
+
     //eins nach links unten gehen
     if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1) && field[x-1][y-1] == '*')
     {
@@ -427,8 +436,8 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
-    
+
+
     //eins nach rechtsunten gehen
     if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1) && field[x+1][y-1] == '*')
     {
@@ -453,7 +462,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
   //buffer für Koordinaten
   char* buffer = malloc(sizeof(char)*3);
-    
+
   char* ergebnis = malloc(sizeof(char)*64);
   strcpy(ergebnis, "");
   char currentField[8][8];
