@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/shm.h>
-
 #include "main.h"
 
 //gibt 1 bei weißen Stein, -1 bei schwarzen Stein, 0 bei leeren Feld(und andere Sachen die nicht auftreten sollten)
@@ -17,65 +11,64 @@ int getTeam(char spielstein){
   }
 }
 
-
-char *getCoordinate(int x, int y){
-  char* coordinate = malloc(sizeof(char) * 3);
+//nimmt einen pointer entgegn, buffer in aufrufender funktion erstellen -> malloc -> am ende freen
+char *getCoordinate(int x, int y, char *buffer){
 
   switch(x){
     case 0:
-      strcpy(coordinate, "A");
+      strcpy(buffer, "A");
       break;
     case 1:
-      strcpy(coordinate, "B");
+      strcpy(buffer, "B");
       break;
     case 2:
-      strcpy(coordinate, "C");
+      strcpy(buffer, "C");
       break;
     case 3:
-      strcpy(coordinate, "D");
+      strcpy(buffer, "D");
       break;
     case 4:
-      strcpy(coordinate, "E");
+      strcpy(buffer, "E");
       break;
     case 5:
-      strcpy(coordinate, "F");
+      strcpy(buffer, "F");
       break;
     case 6:
-      strcpy(coordinate, "G");
+      strcpy(buffer, "G");
       break;
     case 7:
-      strcpy(coordinate, "H");
+      strcpy(buffer, "H");
       break;
   }
 
   switch(y){
     case 0:
-      strcat(coordinate, "1");
+      strcat(buffer, "1");
       break;
     case 1:
-      strcat(coordinate, "2");
+      strcat(buffer, "2");
       break;
     case 2:
-      strcat(coordinate, "3");
+      strcat(buffer, "3");
       break;
     case 3:
-      strcat(coordinate, "4");
+      strcat(buffer, "4");
       break;
     case 4:
-      strcat(coordinate, "5");
+      strcat(buffer, "5");
       break;
     case 5:
-      strcat(coordinate, "6");
+      strcat(buffer, "6");
       break;
     case 6:
-      strcat(coordinate, "7");
+      strcat(buffer, "7");
       break;
     case 7:
-      strcat(coordinate, "8");
+      strcat(buffer, "8");
       break;
   }
 
-  return coordinate;
+  return buffer;
 }
 
 
@@ -124,11 +117,11 @@ void printField(char field[8][8])
 int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
 {
   int ergebnis;
-  char* enemy[2];
-  memcpy(enemy,getEnemy,sizeof(char)*2);
+  char* enemy = getEnemy(field[x][y]);
+  //memcpy(enemy,getEnemy,sizeof(char)*2);
 
   //check Bauer
-  if(field[x+rx][y+ry]==*enemy[0])
+  if(field[x+rx][y+ry] == enemy[0])
     {ergebnis = 1;}
 
   //check Dame
@@ -137,17 +130,19 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8])
     for (int distance = 1; distance<8; distance ++){
       int xnew = x+(distance*rx);
       int ynew = y+(distance*ry);
-      
+
       if(inBound(xnew,ynew))
       {
-        if(field[xnew][ynew]==*enemy[1])
+        if(field[xnew][ynew]== enemy[1])
           {ergebnis = 1;}
       }
       else
         {break;}
     }
   }
-return ergebnis;
+
+  free(enemy);
+  return ergebnis;
 }
 
 
@@ -177,7 +172,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
   char* enemy[2];
   memcpy(enemy,getEnemy,sizeof(char)*2);
   //überprüfe alle 4 Richtungen nach gegnerischen Steinen und ob sie schlagen können, falls ja erfolgt eine Abwertung
-  
+
   //links oben
   //Feind ja
   if(checkEnemy(-1,1,x,y,field))
@@ -188,7 +183,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   //rechts oben
   if(checkEnemy(1,1,x,y,field))
   {
@@ -197,7 +192,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   // links unten
   if(checkEnemy(-1,-1,x,y,field))
   {
@@ -206,7 +201,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
+
   //rechts unten
   if(checkEnemy(1,-1,x,y,field))
   {
@@ -215,8 +210,8 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=strike;
     }
   }
-  
-  
+
+
   // Abwertung bei verlassen der letzten Reihe
   //???? aktuell nur für Bauern! (weiß nicht ob auch für Dame sinnvoll)
   if(colour=='b'||colour=='B')
@@ -233,7 +228,7 @@ int getWeight(int x, int y, char field[8][8], char colour)
       gewichtung+=lastRow;
     }
   }
-  
+
   // Aufwertung, wenn Bauer gekrönt wird
   if(colour=='b' && y==0)
   {
@@ -243,25 +238,29 @@ int getWeight(int x, int y, char field[8][8], char colour)
   {
     gewichtung+=crown;
   }
-  
-  
-  
-  //TODO Aufwertung wenn der Zug in die Mittelzone geht  
-  
+
+
+
+  //TODO Aufwertung wenn der Zug in die Mittelzone geht
+    //überprüft den abstand von der Ziel-Koordinate zu E5
+  gewichtung += (4 - abs(4-y));
+  gewichtung += (4 - abs(4-x));
+
+
   //TODO evtl Aufwertung, für eigene Steine in der nähe, aber durch die strikeable Abfrage evtl redundant
-  
-  
+
+
   //gewichtung += checkEnemy(-1,1,x,y,field);
   //gewichtung += strikeable(-1,1,x,y,field);
-  
+
   //rechts oben
   //gewichtung += checkEnemy(1,1,x,y,field);
-  
-  
+
+
 /*
   //colour of the own token/player colour
   int weight = 0;
-  //direction in which to check -1 for 
+  //direction in which to check -1 for
   int direction = 0;
   if(field[x][y] == 'b' || field[x][y] == 'w')
   {
@@ -276,14 +275,20 @@ int getWeight(int x, int y, char field[8][8], char colour)
         colour = 'w';
         direction=1;
       }
-    
+
     //check for enemy strikes
     //enemy token on the left
     if(inBound(x+direction, y-1) && field[x+direction][y-1])
     {
-      
+
     }
   }*/
+  if (gewichtung < 0) {
+    return 0;
+  } else {
+    return gewichtung;
+  }
+
 }
 
 
@@ -294,6 +299,9 @@ int getWeight(int x, int y, char field[8][8], char colour)
 
 struct queenData queenStrike(int rx, int ry, struct queenData strike)
 {
+
+    //buffer für Koordinaten
+    char* buffer = malloc(sizeof(char)*3);
     //printf("Starte queenStrike\n");
     struct queenData temp;
     printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
@@ -313,7 +321,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
             //ist das zu schlagende Feld ein gegnerisches, dahinter frei und das Feld davor frei oder die eigene Figur
             if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*' && (strike.field[xnew-rx][ynew-ry] == strike.ownColour || strike.field[xnew-rx][ynew-ry] == '*'))
                 {
-                    strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry));
+                    strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry, buffer));
                     strcat(strike.moveATM, ":");
                     strcpy(strike.bestMove.zug,strike.moveATM);
                     strike.bestMove.gewichtung = strike.bestMove.gewichtung + 1000;
@@ -360,6 +368,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
             }
     }
+    free(buffer);
 return strike;
 }
 
@@ -370,13 +379,17 @@ return strike;
 
 struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char field[8][8], char enemyColour[2], char ownColour)
 {
+
+    //buffer für Koordinaten
+    char* buffer = malloc(sizeof(char)*3);
+
     printf("Start queenMove\n");
     //create and fill queenData
     struct queenData strike;
     strike.x = x;
     strike.y = y;
     strike.success = 0;
-    strcpy(strike.moveATM, getCoordinate(x,y));
+    strcpy(strike.moveATM, getCoordinate(x,y, buffer));
     strcat(strike.moveATM, ":");
     memcpy(strike.field, field, sizeof(char)*8*8);
     strike.enemyColour[0] = enemyColour[0];
@@ -397,44 +410,45 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
 
     //Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
     //eins nach links oben gehen +1
-    if(strike.bestMove.gewichtung<0 && inBound(x-1,y+1))
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y+1) && field[x-1][y+1] == '*')
     {
-      strcat(strike.moveATM, getCoordinate(x-1,y+1));
+      strcat(strike.moveATM, getCoordinate(x-1,y+1, buffer));
       strcat(strike.moveATM, ":");
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
+
     //eins nach rechts oben gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1))
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y+1) && field[x+1][y+1] == '*')
     {
-      strcat(strike.moveATM, getCoordinate(x+1,y+1));
+      strcat(strike.moveATM, getCoordinate(x+1,y+1, buffer));
       strcat(strike.moveATM, ":");
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
-    
+
+
     //eins nach links unten gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1))
+    if(strike.bestMove.gewichtung<0 && inBound(x-1,y-1) && field[x-1][y-1] == '*')
     {
-      strcat(strike.moveATM, getCoordinate(x-1,y-1));
+      strcat(strike.moveATM, getCoordinate(x-1,y-1, buffer));
       strcat(strike.moveATM, ":");
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
-    
-    
+
+
     //eins nach rechtsunten gehen
-    if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1))
+    if(strike.bestMove.gewichtung<0 && inBound(x+1,y-1) && field[x+1][y-1] == '*')
     {
-      strcat(strike.moveATM, getCoordinate(x+1,y-1));
+      strcat(strike.moveATM, getCoordinate(x+1,y-1, buffer));
       strcat(strike.moveATM, ":");
       strcpy(strike.bestMove.zug, strike.moveATM);
       strike.bestMove.gewichtung = 0;
     }
 
     //release variables
+    free(buffer);
     return strike.bestMove;
 }
 
@@ -446,7 +460,11 @@ struct moeglicherZug queenMove(int x, int y, struct moeglicherZug bestMove, char
 //Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen";
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
+  //buffer für Koordinaten
+  char* buffer = malloc(sizeof(char)*3);
+
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -458,9 +476,11 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     tempMove.gewichtung = -1;
   }
 
-  //moveBisher  = malloc(sizeof(char)*64);
-  strcat(moveBisher, getCoordinate(x,y));         //concate move
+  strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
   strcat(moveBisher, ":");
+
+  strcpy(currentMove.zug, moveBisher);
+  strcpy(tempMove.zug, moveBisher);
   //pawn move
   if (currentField[x][y] == 'w') {
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
@@ -502,7 +522,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
      }
     } else  if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
-      strcat(moveBisher, getCoordinate(x-1, y+1));
+      strcat(moveBisher, getCoordinate(x-1, y+1, buffer));
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove.gewichtung++;
@@ -513,7 +533,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
      }
     } else if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       //nach rechts oben bewegen
-      strcat(moveBisher, getCoordinate(x+1, y+1));
+      strcat(moveBisher, getCoordinate(x+1, y+1, buffer));
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
       currentMove.gewichtung++;
@@ -545,6 +565,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(ergebnis);
+    free(buffer);
     //printf("momentaner Zug: %s", currentMove.zug);
     //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
@@ -556,9 +578,11 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
 struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
-  printf("Start possibleMovesBlack\n");
+  //buffer für Koordinaten
+  char* buffer = malloc(sizeof(char)*3);
 
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -570,9 +594,12 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     tempMove.gewichtung = -1;
   }
 
-  //moveBisher  = malloc(sizeof(char)*64);
-  strcat(moveBisher, getCoordinate(x,y));         //concate move
+  strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
   strcat(moveBisher, ":");
+
+  strcpy(currentMove.zug, moveBisher);
+  strcpy(tempMove.zug, moveBisher);
+
   //pawn move
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
@@ -624,7 +651,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x-1, y-1) && (currentField[x-1][y-1] == '*') && (geschlagen == 0)) {
       //nach links unten bewegen
-      strcat(moveBisher, getCoordinate(x-1, y-1));
+      strcat(moveBisher, getCoordinate(x-1, y-1, buffer));
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove.gewichtung++;
@@ -635,7 +662,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       }
     }else if (inBound(x+1, y-1) && (currentField[x+1][y-1] == '*') && (geschlagen == 0)) {
       //nach rechts unten bewegen
-      strcat(moveBisher, getCoordinate(x+1, y-1));
+      strcat(moveBisher, getCoordinate(x+1, y-1, buffer));
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
       tempMove.gewichtung++;
@@ -667,6 +694,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(ergebnis);
+    free(buffer);
     //printf("momentaner Zug: %s", currentMove.zug);
     //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
@@ -681,9 +710,9 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 char* think() {
 
   struct Spieldaten *spieldaten;
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   char* ergebnis = malloc(sizeof(char)*64);
+  strcpy(ergebnis, "");
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");

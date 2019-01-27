@@ -1,91 +1,100 @@
 //Bibliotheken einbinden
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include "main.h" 
 
 char* getHostname(char* file){
 
   FILE* fpointer;
-  char *line = (char*) malloc(sizeof(char)*256);
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
   char *ptr;
+  char *ergebnis = malloc(sizeof(char)*64);
 
   fpointer = fopen(file, "r");
-  while(!feof(fpointer)){
-    fgets(line, 256, fpointer);
-    //remove new line character
-    char *newline = strchr(line, '\n');
-    if(newline) *newline = 0;
+  
+  while((read = getline(&line, &len, fpointer)) != -1){
+    
     ptr = strtok(line, " =");
     if(strcmp(ptr, "hostname") == 0){
       ptr = strtok(NULL, " =");
-      fclose(fpointer);
-      free(line);
-      return ptr;
+      break;
     }
   }
-  printf("Fehler in der Konfigurationsdatei");
-  exit(EXIT_FAILURE);
+
+  ptr[strlen(ptr)-1] = 0;
+  fclose(fpointer);
+
+  strcpy(ergebnis, ptr);
   free(line);
-  return "hello";
+  return ergebnis;
 }
 
 
 int getPort(char* file){
 
   FILE* fpointer;
-  char *line = (char*) malloc(sizeof(char)*256);
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
   char *ptr;
+  int ergebnis;
 
   fpointer = fopen(file, "r");
-  while(!feof(fpointer)){
-    fgets(line, 256, fpointer);
-    ptr = strtok(line, " =\n");
+  
+  while((read = getline(&line, &len, fpointer)) != -1){
+    
+    ptr = strtok(line, " =");
     if(strcmp(ptr, "portnumber") == 0){
       ptr = strtok(NULL, " =");
-      fclose(fpointer);
-      free(line);
-      return atoi(ptr);
+      break;
     }
   }
-  printf("Fehler in der Konfigurationsdatei");
-  exit(EXIT_FAILURE);
+
+  ptr[strlen(ptr)-1] = 0;
+  fclose(fpointer);
+  ergebnis = atoi(ptr);
   free(line);
-  return 0;
+  return ergebnis;
 }
+
 
 
 char* getGamekind(char* file){
 
   FILE* fpointer;
-  char *line = (char*) malloc(sizeof(char)*256);
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
   char *ptr;
+  char *ergebnis = malloc(sizeof(char)*64);
 
   fpointer = fopen(file, "r");
-  while(!feof(fpointer)){
-    fgets(line, 256, fpointer);
-    //remove new line character
-    char *newline = strchr(line, '\n');
-    if(newline) *newline = 0;
-    ptr = strtok(line, " =\n");
+  
+  while((read = getline(&line, &len, fpointer)) != -1){
+    
+    ptr = strtok(line, " =");
     if(strcmp(ptr, "gamekind") == 0){
       ptr = strtok(NULL, " =");
-      fclose(fpointer);
-      free(line);
-      return ptr;
+      break;
     }
   }
-  printf("Fehler in der Konfigurationsdatei");
-  exit(EXIT_FAILURE);
+
+  ptr[strlen(ptr)-1] = 0;
+  fclose(fpointer);
+  strcpy(ergebnis, ptr);
   free(line);
-  return 0;
+  return ergebnis;
 }
 
 
 struct Configuration setConfig(char* file){
   struct Configuration conf;
-  strcpy(conf.hostname, getHostname(file));
+  char* temp = getHostname(file);
+  strcpy(conf.hostname, temp);
+  free(temp);
+  temp = getGamekind(file);
+  strcpy(conf.gamekind, temp);
+  free(temp);
   conf.portnumber = getPort(file);
-  strcpy(conf.gamekind, getGamekind(file));
   return conf;
 }

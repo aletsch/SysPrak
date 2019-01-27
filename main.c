@@ -1,24 +1,5 @@
-//#define GAMEKINDNAME "Checkers"
-//#define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
-//#define PORTNUMBER 1357
-
-//Bibliotheken einbinden
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <signal.h>
-
-//weitere Programmteile einbinden
-#include "performConnection.c"
-#include "conf.c"
-#include "communication.c"
+//Bibliotheken und header einbinden
 #include "main.h"
-#include "think.c"
 
 
 // struct Spieldaten {
@@ -30,6 +11,8 @@
 //   char field[8][8];
 //
 // } spieldaten;
+
+int shmID;
 
 void error(char message[BUF])
 {
@@ -45,7 +28,6 @@ void printHilfe(){
 
 void signalHandler(int signal) {
   
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
@@ -58,8 +40,8 @@ void signalHandler(int signal) {
 }
 
 void signalTerm(int signal){
+
   signal = signal +1;   //damit das makefile nicht meckert
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   struct Spieldaten *spieldaten;
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
   shmctl(shmID, IPC_RMID, NULL);
@@ -122,9 +104,8 @@ int main(int argc,char** argv){
   struct Configuration configStruct = setConfig(config);
 
   //create the shared memory
-  int shmID;
   //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-  shmID = shmget(KEY, SHMSIZE ,IPC_CREAT | 0666);
+  shmID = shmget(IPC_PRIVATE, SHMSIZE ,IPC_CREAT | 0666);
 
   //attach shared memory to processes
   struct Spieldaten *spieldaten;
@@ -135,21 +116,17 @@ int main(int argc,char** argv){
 
   spieldaten -> thinkFlag = 0;
 
-
-  //test
-  // spieldaten.playerNumber =  atoi(player);
-  // printf("Player im SHM: %i\n", spieldaten.playerNumber);
-  // printf("SHM-ID: %i\n", shmID);
-
   //Erstellen der Pipe
 	int fd[2];
 	if (pipe(fd) < 0) {
 		error("Fehler beim Erstellen der pipe");
+    return -1;
 	}
 
 	pid_t pid = fork();
 	if (pid<0) {
 		error("Fehler beim Gabeln der Prozesse");
+    return -1;
 	} else
 	if (pid==0) {
 		//Hier beginnt der Connector = Kindprozess
@@ -162,14 +139,24 @@ int main(int argc,char** argv){
     int *sock;
     sock = (int *)malloc(4*sizeof(int));
     *sock = socket(AF_INET, SOCK_STREAM, 0);
-    connectToServer(sock, configStruct.hostname, configStruct.portnumber);
-    performConnection(gid, player, configStruct.gamekind, sock);
+    if(connectToServer(sock, configStruct.hostname, configStruct.portnumber) == -1){
+      free(sock);
+      return -1;
+    }
+    if(performConnection(gid, player, configStruct.gamekind, sock) == -1){
+      kill(spieldaten -> thinker, SIGTERM);
+      close(*sock);
+      free(sock);
+      shmdt(spieldaten);
+      return -1;
+    }
 
     communication(sock, fd[0]);
     shmdt(spieldaten);
 
     //close connection
     close(*sock);
+    free(sock);
 
     close(fd[0]);
     return 0;
@@ -193,10 +180,10 @@ int main(int argc,char** argv){
     while(spieldaten->thinkFlag != -1){     
       if(spieldaten->thinkFlag){
         spieldaten->thinkFlag = 0;
-        char finalMove[64] = "";
+        char* finalMove = think();
 
-        strcpy(finalMove, think());
         write(fd[1], finalMove, strlen(finalMove));
+        free(finalMove);
       }  
       sleep(1);
     }

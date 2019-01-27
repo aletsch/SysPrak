@@ -13,8 +13,31 @@
 #define KEY 6543
 #define SHMSIZE 2*sizeof(int)+BUF+2*sizeof(pid_t)+160
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <signal.h>
+#include <sys/socket.h>
+
+
 extern void error(char message[BUF]);
 extern void signalHandler(int signal);
+
+extern int shmID;
+
+void printBoard();
+struct Configuration setConfig(char* file);
+int connectToServer(int* sock, char* host, int port);
+int performConnection(char* gameID, char* player, char* gamekind, int* sock);
+int communication(int *socket, int pipe);
+char* think();
+int readServer(int *socket, char *buffer);
+int writeServer(int *socket, char *buffer, char message[BUF]);
 
 struct Spieldaten {
   char gameName[BUF];
@@ -28,9 +51,9 @@ struct Spieldaten {
 };
 
 struct Configuration{
-  char hostname[64];
+  char hostname[BUF];
   int portnumber;
-  char gamekind[64];
+  char gamekind[BUF];
 };
 
 struct moeglicherZug{

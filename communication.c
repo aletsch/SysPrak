@@ -1,16 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
-
 #include "main.h"
 
 void printBoard(){
 
   struct Spieldaten *spieldaten;
 
-  int shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
   for(int i = 7; i >= 0; i--){
@@ -24,13 +17,7 @@ void printBoard(){
 
 int updateBoard(char* board){
 
-  int shmID = 0;
   struct Spieldaten *spieldaten;
-
-  //int shmSize = 2*sizeof(int)+BUF+2*sizeof(pid_t)+160;
-
-  shmID = shmget(KEY, SHMSIZE, 0666);
-
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
 
@@ -92,9 +79,7 @@ int spielerBereit(char* line){
 
 int communication(int *socket, int pipe){
 
-  int shmID = 0;
   struct Spieldaten *spieldaten;
-  shmID = shmget(KEY, SHMSIZE, 0666);
   spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
 
   int gameover = 0;
