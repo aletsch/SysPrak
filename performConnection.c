@@ -79,7 +79,7 @@ int writeServer(int *socket, char *buffer, char message[BUF]){
   strcpy(buffer, message);
 
   if(write(*socket, buffer, strlen(buffer)) != 0){
-    printf("Client: %s", buffer);
+    //printf("Client: %s", buffer);
     return 0;
   }
   return -1;
