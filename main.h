@@ -30,14 +30,14 @@ extern void signalHandler(int signal);
 
 extern int shmID;
 
-void printBoard();
-struct Configuration setConfig(char* file);
-int connectToServer(int* sock, char* host, int port);
-int performConnection(char* gameID, char* player, char* gamekind, int* sock);
-int communication(int *socket, int pipe);
-char* think();
-int readServer(int *socket, char *buffer);
-int writeServer(int *socket, char *buffer, char message[BUF]);
+extern void printBoard();
+extern struct Configuration setConfig(char* file);
+extern int connectToServer(int* sock, char* host, int port);
+extern int performConnection(char* gameID, char* player, char* gamekind, int* sock);
+extern int communication(int *socket, int pipe);
+extern char* think();
+extern int readServer(int *socket, char *buffer);
+extern int writeServer(int *socket, char *buffer, char message[BUF]);
 
 struct Spieldaten {
   char gameName[BUF];
