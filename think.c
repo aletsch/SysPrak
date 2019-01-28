@@ -178,6 +178,7 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
   int cs = 0;
   char *enemy = getEnemy(colour);
   
+  //2*for zum durchgehen der 4 Richtungen
   for(int rx=-1; rx==1; rx+=2)
   {
     for(int ry=-1; ry==1; ry+=2)
@@ -190,16 +191,22 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
       //Figur ist eine Dame
       else if(colour=='B' || colour == 'W')
       {
+        //checke auf der Diagonale nach schlagbaren feindlichen Steinen
         for(int distance=1; distance<8; distance ++)
         {
+          //ist das zu schlagende Feld und das dahinter noch auf dem Board?
           if(inBound((x+(rx*distance)),(y+(ry*distance))) && inBound((x+(rx*distance)+ry),(y+(ry*distance)+ry)))
           {
-            if((field[x+(rx*distance)][y+(ry*distance)]==enemy[0] || field[x+(rx*distance)][y+(ry*distance)]==enemy[1]) && field[x+(rx*distance)+rx][y+(ry*distance)+rx]=='*')
-            {
-              cs=1;
-            }
-          else
-            {break;}
+            //wenn das Feld leer ist tu nichts und untersuche das nächste
+            if(field[x+(rx*distance)][y+(ry*distance)]=='*')
+            {}
+            //ist das zu schlagende Feld ein Feind und das Feld dahinter frei, wenn ja cs=1 sonst stoppe Schleife
+            else if((field[x+(rx*distance)][y+(ry*distance)]==enemy[0] || field[x+(rx*distance)][y+(ry*distance)]==enemy[1]) && field[x+(rx*distance)+rx][y+(ry*distance)+rx]=='*')
+              {
+                cs=1;
+              }
+              else
+                {break;}
           }
         }
       }
@@ -442,18 +449,27 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
     int gewichtungTemp;
     for(int distance = 1; distance<8; distance++)
     {
+      //ist das angegeben Feld noch auf dem Board?
       if(inBound(strike.x+(distance*rx),strike.y+(distance*ry)))
       {
-        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance+ry),strike.field,strike.field[strike.x][strike.y]);
-        if(strike.bestMove.gewichtung<gewichtungTemp && strike.field[strike.x+(distance*rx)][strike.y+(distance*rx)] == '*')
+        //berechne gewichtung für das Feld
+        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y]);
+        //checke, ob das Feld/der Move besser ist
+        if(strike.bestMove.gewichtung<gewichtungTemp)
         {
-          strcat(strike.moveATM, getCoordinate(strike.x-distance,strike.y+distance, buffer));
-          strcat(strike.moveATM, ":");
-          strcpy(strike.bestMove.zug, strike.moveATM);
-          strike.bestMove.gewichtung = gewichtungTemp;
+          //wenn das Feld frei ist speicher es als bestes Feld sonst brich die Schleife ab
+          if(strike.field[strike.x+(distance*rx)][strike.y+(distance*rx)] == '*')
+          {
+            strcat(strike.moveATM, getCoordinate(strike.x+(distance*rx),strike.y+(distance*ry),buffer));
+            //strcat(strike.moveATM, getCoordinate(strike.x-distance,strike.y+distance, buffer));
+            strcat(strike.moveATM, ":");
+            strcpy(strike.bestMove.zug, strike.moveATM);
+            strike.bestMove.gewichtung = gewichtungTemp;
+          }
+          else
+            {break;}
         }
-        else
-          {break;}
+
       }
     else
       {break;}
@@ -820,4 +836,4 @@ char* think() {
   printf("thinker sagt%s \n", ergebnis);
   shmdt(spieldaten);
   return ergebnis;
-}
+} 

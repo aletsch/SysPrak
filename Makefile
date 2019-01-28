@@ -28,3 +28,5 @@ play: sysprak-client
   
 clean:
 	rm -f *.o sysprak-client test
+
+rebuild: clean sysprak-client
