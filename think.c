@@ -593,7 +593,7 @@ struct moeglicherZug queenMain(int x, int y, struct moeglicherZug bestMove, char
 
 
 //hier werden alle züge einer weißen Figur auf Gültigkeit geprüft
-//Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; kann geschlagen werden "geschlagen";
+//Übergabewerte aktuelle Position "(x,y)"; der aktuelle beste Zug "bestMove"; hat schon geschlagen "geschlagen";
 struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestMove, int geschlagen, char* moveBisher, char field[8][8]) {
 
   //buffer für Koordinaten
@@ -621,20 +621,21 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'w') {
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
       //nach links oben schlagen
-      currentMove.gewichtung = currentMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
       currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesWhite(x-2, y+2, currentMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesWhite(x-2, y+2, tempMove, 1 , moveBisher, currentField);
       geschlagen = 1;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
      }
     }
 
+    //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
     memcpy(currentField, field, sizeof(char)*8*8);
     if(geschlagen){
      tempMove.gewichtung = bestMove.gewichtung;
@@ -644,14 +645,14 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
       //nach rechts oben schlagen
-      currentMove.gewichtung = currentMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      currentMove = possibleMovesWhite(x+2, y+2, currentMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesWhite(x+2, y+2, tempMove, 1 , moveBisher, currentField);
       geschlagen = 1;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -662,7 +663,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove.gewichtung++;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -672,8 +673,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       strcat(moveBisher, getCoordinate(x+1, y+1, buffer));
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      currentMove.gewichtung++;
-      //goto ZUGBEENDEN;
+      tempMove.gewichtung++;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -747,11 +748,11 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesBlack(x-2, y-2, tempMove, 1 , moveBisher, currentField);
       geschlagen = 1;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
        currentMove = tempMove;
-     }
+     } 
     }
 
 
@@ -771,13 +772,14 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesBlack(x+2, y-2, tempMove, 1 , moveBisher, currentField);
       geschlagen = 1;
-      //goto ZUGBEENDEN;
-
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
       if(tempMove.gewichtung > currentMove.gewichtung){
          currentMove = tempMove;
       }
     }
 
+
+    //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
     memcpy(currentField, field, sizeof(char)*8*8);
     if(geschlagen){
       tempMove.gewichtung = bestMove.gewichtung;
@@ -791,7 +793,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       strcat(moveBisher, ":");
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove.gewichtung++;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
       if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -802,7 +804,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       strcat(moveBisher, ":");
       //printf("moveBewegtRechts: %s\n", moveBisher);
       tempMove.gewichtung++;
-      //goto ZUGBEENDEN;
+      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
