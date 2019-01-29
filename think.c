@@ -120,22 +120,31 @@ void printField(char field[8][8])
 //bei gefundenem Fein return 1 sonst 0
 int checkEnemy(int rx, int ry, int x, int y, char field [8][8], char colour)
 {
-  int ergebnis;
+  char* buffer = malloc(sizeof(char)*3);
+  int ergebnis = 0;
   char *enemy = getEnemy(colour);
   //memcpy(enemy,getEnemy,sizeof(char)*2);
-  printf("Starte checkEnemy\n");
+  /*printf("Starte checkEnemy\n");
   //printf("enemy[0]=%c enemy[1]=%c\n",enemy[0],enemy[1]); 
   printf("rx %i ry %i\n", rx, ry);
   printf("Position x=%i y:%i\n", x, y);
-  printf("check Bauer\n");
+  if(inBound(x,y))
+    {
+      printf("Position getCoordinate: %s\n", getCoordinate(x,y, buffer));
+    }
+  printf("check Bauer\n");*/
 
-  //check Bauer
-  if(field[x+rx][y+ry] == enemy[0])
-    {ergebnis = 1;printf("Bauer gefunden\n");}
+  //check nach Bauer
+  if(inBound(x+rx,y+ry) && field[x+rx][y+ry] == enemy[0])
+    {
+      ergebnis = 1;
+      //printf("Bauer gefunden\n");
+    }
 
-  //check Dame
+  //check nach Dame
   else
   {
+    //printf("Suche Dame\n");
     for (int distance = 1; distance<8; distance ++){
       int xnew = x+(distance*rx);
       int ynew = y+(distance*ry);
@@ -143,14 +152,18 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8], char colour)
       if(inBound(xnew,ynew))
       {
         if(field[xnew][ynew]== enemy[1])
-          {ergebnis = 1;printf("Dame gefunden\n");}
+          {
+            ergebnis = 1;
+            //printf("Dame gefunden\n");
+          }
       }
       else
         {break;}
     }
   }
-  printf("CheckEnemy: %i\n", ergebnis);
+  printf("CheckEnemy Finish: %i\n", ergebnis);
   free(enemy);
+  free(buffer);
   return ergebnis;
 }
 
@@ -162,7 +175,7 @@ int strikeable(int rx, int ry, int x, int y, char field [8][8], char colour)
   int strikeable = 0;
   
   
-  printf("Strikeable Input: rx=%i ry=%i x=%i y=%i\n", rx, ry, x ,y);
+  //printf("Strikeable Input: rx=%i ry=%i x=%i y=%i\n", rx, ry, x ,y);
   if(inBound(x+(-1*rx),y+(-1*ry)) && (field[x+(-1*rx)][y+(-1*ry)]=='*' || field[x+(-1*rx)][y+(-1*ry)]==colour))
     {strikeable=1;}
     
@@ -223,9 +236,18 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
 int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/)
 {
   printf("getWeight START:\nInput x:%i y:%i Farbe: %c\n", x,y,colour);
-  printField(field);
+  /*char* buffer = malloc(sizeof(char)*3);
+  if(inBound(x,y))
+    {
+      printf("Position getCoordinate: %s\n", getCoordinate(x,y, buffer));
+    }
+  else
+    {printf("Position nicht inBound x=%i y=%i", x, y);}
+    
+  free(buffer);*/
+
+  //printField(field);
   //Wertungen
-  printf("Wertungen werden definiert\n");
   int strike = -100;
   int lastRow = -20;
   int crown = 50;
@@ -234,27 +256,40 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   int gewichtung = 0;
   //char* enemy [2];
   char *enemy = getEnemy(colour);
-  printf("enemys %c %c\n", enemy[0], enemy[1]);
+
   //überprüfe alle 4 Richtungen nach gegnerischen Steinen und ob sie schlagen können, falls ja erfolgt eine Abwertung
   
   
-  printf("checkEnemy+strikeable Links oben\n");
+  printf("checkEnemy+strikeable\n");
   //alle vier Richtungen
   for(int rx=-1; rx==1; rx+=2)
   {
     for(int ry=-1; ry==1; ry+=2)
     {
-      //Feind ja
-      if(checkEnemy(rx,ry,x,y,field,colour))
+      if(inBound(x,y))
       {
-        //schlagbar ja -> Abwertung
-        if(strikeable(rx,ry,x,y,field,colour))
+        //Feind ja
+        if(checkEnemy(rx,ry,x,y,field,colour))
         {
-          gewichtung+=strike;
+          //schlagbar ja -> Abwertung
+          if(strikeable(rx,ry,x,y,field,colour))
+          {
+            printf("Strikeable = true");
+            gewichtung+=strike;
+          }
+          else
+          {
+            printf("Strikeable = false");
+            if (checkCounterstrike(x,y,field,colour))
+            { 
+              gewichtung+= counterStrike;
+              printf("Counterstrike possible!");
+            }
+          }
         }
-         else if (checkCounterstrike(x,y,field,colour))
-        { gewichtung+= counterStrike; }
       }
+      else
+        {break;}
     }
   }
 /*  
@@ -295,6 +330,7 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   {
     if( y == 7 && colour =='b')
     {
+      printf("pwan leaving last row malus");
       gewichtung+=lastRow;
     }
   }
@@ -302,6 +338,7 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   {
     if( y == 0 && colour =='w')
     {
+      printf("pawn leaving last row malus");
       gewichtung+=lastRow;
     }
   }
@@ -309,10 +346,12 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   // Aufwertung, wenn Bauer gekrönt wird
   if(colour=='b' && y==0)
   {
+    printf("crown bonus");
     gewichtung+=crown;
   }
   else if(colour=='w'&& y==7)
   {
+    printf("crown bonus");
     gewichtung+=crown;
   }
 
@@ -322,6 +361,7 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   //überprüft den abstand von der Ziel-Koordinate zu E5
   gewichtung += (4 - abs(4-y));
   gewichtung += (4 - abs(4-x));
+  printf("MittenBonus von %i", ((4 - abs(4-y))+(4 - abs(4-x))));
 
 
 
@@ -329,6 +369,7 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   // Abwertung, wenn man einen befreundeten Stein schlagbar macht!
   if( checkEnemy(1,1,x+1,y+1,field,colour) || checkEnemy(1,-1,x+1,y-1,field,colour) || checkEnemy(-1,1,x-1,y+1,field,colour) || checkEnemy(-1,-1,x-1,y-1,field,colour))
   {
+    printf("Abwertung, weil befreundeter Stein schlagbar wird\n");
     gewichtung+=strike;
   }
   
@@ -352,10 +393,10 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
     //printf("Starte queenStrike\n");
     struct queenData temp;
     temp.bestMove.gewichtung = -666666;
-    printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
-    printf("Start queen Strike mit dem Feld:\n");
+    /*printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
+    printf("Start queen Strike mit dem Feld:\n\n");
     printField(strike.field);
-    printf("\n");
+    printf("\n\n");*/
 
 
     for (int distance = 1; distance<8; distance ++){
@@ -433,9 +474,9 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
     }
     free(buffer);
-    printf("Ende queen Strike mit dem Feld:\n");
+    /*printf("Ende queen Strike mit dem Feld:\n");
     printField(strike.field);
-    printf("\n");
+    printf("ENDE-ENDE-ENDE-QUEENSTRIKE-ENDE-ENDE-ENDE\n");*/
     return strike;
 }
 
@@ -443,38 +484,51 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 //rx Richtung x (-1,1); ry Richung ry (-1,1); Die dazugehörigen Daten (strike)
 struct queenData queenMove(int rx, int ry, struct queenData strike)
 {
+  int queenMoveDowngrade = -20;
+  //printf("\n\n----------------------------------------QueenMove START --------------------------------------------------\n\n");
+    
+    //wird benötigt, da moveATM hier immer gleich sein muss, da es der Ausgangspunkt für alle 4 Bewegungsmöglichkeiten ist
+    char moveTemp[64];
+    //printField(strike.field);
+    //printf("Position x=%i y=%i Richtung rx=%i ry=%i\n",strike.x,strike.y,rx,ry);
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
-    //temporäre 
-    int gewichtungTemp;
+    //temporäre Wertung mit unmöglich niedrigem Wert befüllt
+    int gewichtungTemp = -666666;
     for(int distance = 1; distance<8; distance++)
     {
-      //ist das angegeben Feld noch auf dem Board?
-      if(inBound(strike.x+(distance*rx),strike.y+(distance*ry)))
+      //ist das angegeben Feld noch auf dem Board? && ist es leer? -> Abbruch bei nein
+      if(inBound(strike.x+(distance*rx),strike.y+(distance*ry)) && strike.field[strike.x+(distance*rx)][strike.y+(distance*ry)] == '*')
       {
         //berechne gewichtung für das Feld
-        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y]);
+        //printf("Berechne Gewichtung für das Feld [%i][%i] mit Inhalt %c\n",strike.x+(distance*rx),strike.y+(distance*ry), strike.field[strike.x+(distance*rx)][strike.y+(distance*ry)]);
+        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y]) + queenMoveDowngrade;
         //checke, ob das Feld/der Move besser ist
         if(strike.bestMove.gewichtung<gewichtungTemp)
         {
           //wenn das Feld frei ist speicher es als bestes Feld sonst brich die Schleife ab
-          if(strike.field[strike.x+(distance*rx)][strike.y+(distance*rx)] == '*')
-          {
-            strcat(strike.moveATM, getCoordinate(strike.x+(distance*rx),strike.y+(distance*ry),buffer));
-            //strcat(strike.moveATM, getCoordinate(strike.x-distance,strike.y+distance, buffer));
-            strcat(strike.moveATM, ":");
-            strcpy(strike.bestMove.zug, strike.moveATM);
-            strike.bestMove.gewichtung = gewichtungTemp;
-          }
-          else
-            {break;}
-        }
-
+          strcpy(moveTemp, strike.moveATM);
+          strcat(moveTemp, getCoordinate(strike.x+(distance*rx),strike.y+(distance*ry),buffer));
+          //strcat(strike.moveATM, getCoordinate(strike.x-distance,strike.y+distance, buffer));
+          strcat(moveTemp, ":");
+          //printf("MoveTemp %s in for-Schleifenr. %i\n",moveTemp, distance);
+         }
+         
       }
-    else
-      {break;}
+      
+      else
+        {break;}
     }
-  
+    
+    //besten Zug auswählen
+    if(strike.bestMove.gewichtung<gewichtungTemp)
+    {
+      strcpy(strike.bestMove.zug, moveTemp);
+      strike.bestMove.gewichtung = gewichtungTemp;
+    }
+    
+    free(buffer);
+    //printf("\n\nQUEENMOVE -ENDE -ENDE- ENDE -ENDE - QUEENMOVE\n\naktuell bester Move: %s mit der Gewichtung %i", strike.bestMove.zug, strike.bestMove.gewichtung);
     return strike;
 }
 
@@ -489,6 +543,7 @@ struct moeglicherZug queenMain(int x, int y, struct moeglicherZug bestMove, char
     char* buffer = malloc(sizeof(char)*3);
 
     printf("Start queenMain\n");
+    printField(field);
     //create and fill queenData
     struct queenData strike;
     strike.x = x;
@@ -505,14 +560,20 @@ struct moeglicherZug queenMain(int x, int y, struct moeglicherZug bestMove, char
 
     //nach Schlagenden Zuegen suchen
     //links oben
+    printf("Vor QueenStrike x=%i y=%i\n", strike.x, strike.y);
+    //printf("Field vor QueenStrike:         <<<<<--------\n\n");
+    //printField(strike.field);
     strike = queenStrike(-1,1,strike);
     //rechts oben
     strike = queenStrike(1,1,strike);
     //links unten
     strike = queenStrike(-1,-1,strike);
     //rechts unten
-    strike = queenStrike(1,-1,strike);
-
+    strike = queenStrike(1,-1,strike);    
+    
+    printf("Vor QueenMove x=%i y=%i\n", strike.x, strike.y);
+    //printf("Field vor QueenMove:          <<<<<---------\n\n");
+    //printField(strike.field);
     //Nicht schlagende Zuege, wenn eine Dame nicht schlagen kann
     //nach links oben gehen, rechts oben, links unten, rechts unten gehen
     strike = queenMove(-1, 1, strike);
@@ -679,7 +740,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
       //nach links unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 2;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
@@ -703,7 +764,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*')){
       //nach rechts unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 2;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
