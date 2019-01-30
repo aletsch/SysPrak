@@ -609,6 +609,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   char* ergebnis = malloc(sizeof(char)*64);
   strcpy(ergebnis, "");
   
+  
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -622,6 +623,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
   strcat(moveBisher, ":");
+  
+  char* moveBisherRechts = malloc(sizeof(char)*64);
+  strcpy(moveBisherRechts, moveBisher);
 
   strcpy(currentMove.zug, moveBisher);
   strcpy(tempMove.zug, moveBisher);
@@ -660,13 +664,14 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      tempMove = possibleMovesWhite(x+2, y+2, tempMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesWhite(x+2, y+2, tempMove, 1 , moveBisherRechts, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y+2, currentField, 'w');
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
+        strcpy(moveBisher, moveBisherRechts);
      }
      
      //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
@@ -738,6 +743,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(moveBisherRechts);
     free(ergebnis);
     free(buffer);
     //printf("momentaner Zug: %s", currentMove.zug);
@@ -769,6 +775,11 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
   strcat(moveBisher, ":");
+  
+  
+  //falls nach beiden Seiten geschlagen werden kann
+  char* moveBisherRechts = malloc(sizeof(char)*64);
+  strcpy(moveBisherRechts, moveBisher);
 
   strcpy(currentMove.zug, moveBisher);
   strcpy(tempMove.zug, moveBisher);
@@ -808,12 +819,13 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
       //rekursiver Aufruf mit temporären Feld
-      tempMove = possibleMovesBlack(x+2, y-2, tempMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesBlack(x+2, y-2, tempMove, 1 , moveBisherRechts, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y-2, currentField, 'b');
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
       if(tempMove.gewichtung > currentMove.gewichtung){
          currentMove = tempMove;
+         strcpy(moveBisher, moveBisherRechts);
       }
       
       //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
@@ -887,6 +899,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     strncat(ergebnis, moveBisher, strlen(moveBisher)-1);
     strcat(ergebnis, "\n");
     strcpy(currentMove.zug, ergebnis);
+    free(moveBisherRechts);
     free(ergebnis);
     free(buffer);
     //printf("momentaner Zug: %s", currentMove.zug);
