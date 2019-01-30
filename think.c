@@ -827,7 +827,6 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
          currentMove = tempMove;
          strcpy(moveBisher, moveBisherRechts);
       }
-      
       //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
      memcpy(currentField, field, sizeof(char)*8*8);
       if(geschlagen){
