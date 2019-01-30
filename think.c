@@ -775,7 +775,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
   //pawn move
   if (currentField[x][y] == 'b') {
-    if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*')){
+    if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*' && geschlagen != -1)){
       //nach links unten schlagen
       tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
@@ -801,7 +801,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     }
 
 
-    if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*')){
+    if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*' && geschlagen != -1)){
       //nach rechts unten schlagen
       tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
@@ -840,6 +840,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
         currentMove = tempMove;
       }
       
+      
+      //Feld und tempMove resetten, damit die nächste Möglichkeit richtig berechnet/ersetzt werden kann
       memcpy(currentField, field, sizeof(char)*8*8);
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
