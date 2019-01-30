@@ -16,7 +16,7 @@ think.o: think.c main.h
 communication.o: communication.c main.h
 	gcc $(CFLAGS) -c communication.c
 
-conf.o: conf.c
+conf.o: conf.c main.h
 	gcc $(CFLAGS) -c conf.c
 	
 	
