@@ -627,7 +627,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   strcpy(tempMove.zug, moveBisher);
   //pawn move
   if (currentField[x][y] == 'w') {
-    if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*')){
+    if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*' && geschlagen != -1)){
       //nach links oben schlagen
       tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
@@ -652,7 +652,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
      tempMove.gewichtung = -1;
    }
 
-    if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*')){
+    if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*' && geschlagen != -1)){
       //nach rechts oben schlagen
       tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
@@ -667,28 +667,38 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
      }
-    } else  if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
+    }
+    
+    memcpy(currentField, field, sizeof(char)*8*8);
+    if(geschlagen){
+     tempMove.gewichtung = bestMove.gewichtung;
+    } else {
+     tempMove.gewichtung = -1;
+   } 
+    
+    if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
       strcat(moveBisher, getCoordinate(x-1, y+1, buffer));
       strcat(moveBisher, ":");
       currentField[x][y]      = '*';
       currentField[x-1][y+1]  = 'w';
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-2, y+2, currentField, 'w');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y+1, currentField, 'w');
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      tempMove.gewichtung++;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
      }
-    } else if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
+    }
+    
+    if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       //nach rechts oben bewegen
       strcat(moveBisher, getCoordinate(x+1, y+1, buffer));
       strcat(moveBisher, ":");
       currentField[x][y]      = '*';
       currentField[x+1][y+1]  = 'w';
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y+1, currentField, 'w');
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      tempMove.gewichtung++;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
@@ -811,7 +821,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      tempMove.gewichtung++;
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b');
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
       if(tempMove.gewichtung > currentMove.gewichtung){
@@ -824,7 +834,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      tempMove.gewichtung++;
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b');
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
