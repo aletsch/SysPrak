@@ -395,10 +395,10 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
     //printf("Starte queenStrike\n");
     struct queenData temp;
     temp.bestMove.gewichtung = -666666;
-    /*printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
+    printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
     printf("Start queen Strike mit dem Feld:\n\n");
     printField(strike.field);
-    printf("\n\n");*/
+    printf("\n\n");
 
 
     for (int distance = 1; distance<8; distance ++){
@@ -437,7 +437,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
                     //rekursiver Aufruf für Folgeschläge
                     //links oben
-                    //printf("Start der Folgezüge:\nLinks Oben:\n");
+                    printf("Start der Folgezüge:\nLinks Oben:\n");
                     temp=queenStrike(-1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -446,7 +446,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
 
                     //rechts oben
-                    //printf("FZ rechts oben");
+                    printf("FZ rechts oben");
                     temp=queenStrike(1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -454,7 +454,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     }
 
                     //links unten
-                    //printf("FZ links unten");
+                    printf("FZ links unten");
                     temp=queenStrike(-1,-1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -462,7 +462,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     }
 
                     //rechts unten
-                    // printf("FZ rechts unten");
+                     printf("FZ rechts unten");
                     temp=queenStrike(-1,-1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {

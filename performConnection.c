@@ -25,6 +25,11 @@ int hostname_to_ip(char* host, char *ip){
 
   if((rv = getaddrinfo(host, "http", &hints, &servinfo))){
     printf("could not resolve addressinfo\n");
+    //Kill signal schicken + shm freigeben
+    struct Spieldaten *spieldaten;
+    spieldaten = (struct Spieldaten *) shmat(shmID, NULL, 0);
+    kill(spieldaten -> thinker, SIGTERM);
+    shmdt(spieldaten);
     return -1;
   }
 
@@ -48,12 +53,12 @@ int readServer(int *socket, char *buffer){
   if(read(*socket, buffer, BUF) != 0){
     switch (*buffer){
       case '+':
-        //printf("Server: %s", buffer);
+        printf("Server: %s", buffer);
         return 0;
         break;
       case '-':
         printf("Ungültige Serveranfrage: %s", buffer);
-        //printf("PID thinker %i\nPID connector %i\n", spieldaten->thinker, spieldaten->connector);
+        printf("PID thinker %i\nPID connector %i\n", spieldaten->thinker, spieldaten->connector);
         //kill(spieldaten -> thinker, SIGTERM);
         shmdt(spieldaten);
         return -1;
@@ -89,7 +94,9 @@ int connectToServer(int* sock, char* host, int port){
   //get ip
   char *ip = malloc(60*sizeof(char));
   char *hostname = host;
+  //failed to load IP
   if (hostname_to_ip(hostname, ip) == -1){
+    free(ip);
     return -1;
   }
 
