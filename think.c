@@ -502,7 +502,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
     //temporäre Wertung mit unmöglich niedrigem Wert befüllt
-    int gewichtungTemp = -666666;
+    int gewichtungTemp = -500;
     for(int distance = 1; distance<8; distance++)
     {
       //ist das angegeben Feld noch auf dem Board? && ist es leer? -> Abbruch bei nein
@@ -616,8 +616,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -666666;
-    tempMove.gewichtung = -666666;
+    currentMove.gewichtung = -500;
+    tempMove.gewichtung = -500;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
@@ -683,8 +683,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       //nach links oben bewegen
       currentField[x][y]      = '*';
       currentField[x-1][y+1]  = 'w';
-      tempMove = possibleMovesWhite(x-1, y+1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y+1, currentField, 'w');
+      tempMove = possibleMovesWhite(x-1, y+1, tempMove, -1 , moveBisher, currentField);
       geschlagen = -1;
       //printf("moveBewegtLinks: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
@@ -706,8 +706,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       //nach rechts oben bewegen
       currentField[x][y]      = '*';
       currentField[x+1][y+1]  = 'w';
-      tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y+1, currentField, 'w');
+      tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisher, currentField);
       geschlagen = -1;
       //printf("moveBewegtRechts: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
@@ -763,8 +763,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -666666;
-    tempMove.gewichtung = -666666;
+    currentMove.gewichtung = -500;
+    tempMove.gewichtung = -500;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
@@ -831,8 +831,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b');
+      tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -855,8 +855,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b');
+      tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -909,7 +909,7 @@ char* think() {
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");
-  spielzug.gewichtung = -666666;
+  spielzug.gewichtung = -500;
 
   char currentField[8][8];
   memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
