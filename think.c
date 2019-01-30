@@ -370,10 +370,10 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
 
 
   // Abwertung, wenn man einen befreundeten Stein schlagbar macht!
-  if( ((field[x+1][y+1] == ownColour[0] || field[x+1][y+1] == ownColour[1]) && checkEnemy(1,1,x+1,y+1,field,colour)) ||
-      ((field[x+1][y-1] == ownColour[0] || field[x+1][y-1] == ownColour[1]) && checkEnemy(1,-1,x+1,y-1,field,colour)) ||
-      ((field[x-1][y+1] == ownColour[0] || field[x-1][y+1] == ownColour[1]) && checkEnemy(-1,1,x-1,y+1,field,colour)) ||
-      ((field[x-1][y-1] == ownColour[0] || field[x-1][y-1] == ownColour[1]) && checkEnemy(-1,-1,x-1,y-1,field,colour)) )
+  if( (inBound(x+1,y+1) && (field[x+1][y+1] == ownColour[0] || field[x+1][y+1] == ownColour[1]) && checkEnemy(1,1,x+1,y+1,field,colour)) ||
+      (inBound(x+1,y-1) && (field[x+1][y-1] == ownColour[0] || field[x+1][y-1] == ownColour[1]) && checkEnemy(1,-1,x+1,y-1,field,colour)) ||
+      (inBound(x-1,y+1) && (field[x-1][y+1] == ownColour[0] || field[x-1][y+1] == ownColour[1]) && checkEnemy(-1,1,x-1,y+1,field,colour)) ||
+      (inBound(x-1,y-1) && (field[x-1][y-1] == ownColour[0] || field[x-1][y-1] == ownColour[1]) && checkEnemy(-1,-1,x-1,y-1,field,colour)) )
   {
     printf("Abwertung, weil befreundeter Stein schlagbar wird %i\n aktuelle Gewichtung: %i", strike, gewichtung);
     gewichtung+=strike;
