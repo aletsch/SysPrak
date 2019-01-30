@@ -116,6 +116,8 @@ void printField(char field[8][8])
         printf("\n");
     }
 }
+
+
 //überprüft nach Feinden in gegebene Richtung(rx,ry) an Position (x,y) und gibt bei gefunden und in schlagreichweite 1 zurück, colour gibt den eigenen Spielstein an (Dame/Bauer+Farbe)
 //bei gefundenem Fein return 1 sonst 0
 int checkEnemy(int rx, int ry, int x, int y, char field [8][8], char colour)
@@ -393,10 +395,10 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
     //printf("Starte queenStrike\n");
     struct queenData temp;
     temp.bestMove.gewichtung = -666666;
-    /*printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
+    printf("strike.bestMove.gewichtung: %i\n", strike.bestMove.gewichtung);
     printf("Start queen Strike mit dem Feld:\n\n");
     printField(strike.field);
-    printf("\n\n");*/
+    printf("\n\n");
 
 
     for (int distance = 1; distance<8; distance ++){
@@ -435,7 +437,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
                     //rekursiver Aufruf für Folgeschläge
                     //links oben
-                    //printf("Start der Folgezüge:\nLinks Oben:\n");
+                    printf("Start der Folgezüge:\nLinks Oben:\n");
                     temp=queenStrike(-1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -444,7 +446,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
 
                     //rechts oben
-                    //printf("FZ rechts oben");
+                    printf("FZ rechts oben");
                     temp=queenStrike(1,1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -452,7 +454,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     }
 
                     //links unten
-                    //printf("FZ links unten");
+                    printf("FZ links unten");
                     temp=queenStrike(-1,-1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -460,7 +462,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     }
 
                     //rechts unten
-                    // printf("FZ rechts unten");
+                     printf("FZ rechts unten");
                     temp=queenStrike(-1,-1,strike);
                     if(temp.bestMove.gewichtung>strike.bestMove.gewichtung)
                     {
@@ -485,7 +487,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 struct queenData queenMove(int rx, int ry, struct queenData strike)
 {
   int queenMoveDowngrade = -20;
-  //printf("\n\n----------------------------------------QueenMove START --------------------------------------------------\n\n");
+  printf("\n\n----------------------------------------QueenMove START --------------------------------------------------\n\n");
     
     //wird benötigt, da moveATM hier immer gleich sein muss, da es der Ausgangspunkt für alle 4 Bewegungsmöglichkeiten ist
     char moveTemp[64];
@@ -528,7 +530,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
     }
     
     free(buffer);
-    //printf("\n\nQUEENMOVE -ENDE -ENDE- ENDE -ENDE - QUEENMOVE\n\naktuell bester Move: %s mit der Gewichtung %i", strike.bestMove.zug, strike.bestMove.gewichtung);
+    printf("\n\nQUEENMOVE -ENDE -ENDE- ENDE -ENDE - QUEENMOVE\n\naktuell bester Move: %s mit der Gewichtung %i", strike.bestMove.zug, strike.bestMove.gewichtung);
     return strike;
 }
 
@@ -598,9 +600,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
   //buffer für Koordinaten
   char* buffer = malloc(sizeof(char)*3);
-
   char* ergebnis = malloc(sizeof(char)*64);
   strcpy(ergebnis, "");
+  
   char currentField[8][8];
   memcpy(currentField, field, sizeof(char)*8*8);
   struct moeglicherZug currentMove, tempMove;
@@ -855,7 +857,7 @@ char* think() {
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");
-  spielzug.gewichtung = -2;
+  spielzug.gewichtung = -66666;
 
   char currentField[8][8];
   memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
@@ -897,4 +899,4 @@ char* think() {
   printf("thinker sagt%s \n", ergebnis);
   shmdt(spieldaten);
   return ergebnis;
-} 
+}
