@@ -831,7 +831,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
       //printf("moveBewegtLinks: %s\n", moveBisher);
-      tempMove = possibleMovesBlack(x-1, y-1, tempMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b');
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
@@ -853,7 +853,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
       //printf("moveBewegtRechts: %s\n", moveBisher);
-      tempMove = possibleMovesBlack(x+1, y-1, tempMove, 1 , moveBisher, currentField);
+      tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b');
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
