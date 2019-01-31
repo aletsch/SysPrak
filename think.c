@@ -136,11 +136,11 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8], char colour)
     }
   printf("check Bauer\n");*/
 
-  //check nach Bauer
-  if(inBound(x+rx,y+ry) && field[x+rx][y+ry] == enemy[0])
+  //check nach Bauer oder Dame auf +1
+  if(inBound(x+rx,y+ry) && (field[x+rx][y+ry] == enemy[0] || field[x+rx][y+ry] == enemy[1]))
     {
       ergebnis = 1;
-      //printf("Bauer gefunden\n");
+      printf("Bauer gefunden\n");
     }
 
   //check nach Dame
@@ -156,7 +156,7 @@ int checkEnemy(int rx, int ry, int x, int y, char field [8][8], char colour)
         if(field[xnew][ynew]== enemy[1])
           {
             ergebnis = 1;
-            //printf("Dame gefunden\n");
+            printf("Dame gefunden\n");
           }
       }
       else
@@ -177,7 +177,7 @@ int strikeable(int rx, int ry, int x, int y, char field [8][8], char colour)
   int strikeable = 0;
   
   
-  //printf("Strikeable Input: rx=%i ry=%i x=%i y=%i\n", rx, ry, x ,y);
+  printf("Strikeable Input: rx=%i ry=%i x=%i y=%i\n", rx, ry, x ,y);
   if(inBound(x+(-1*rx),y+(-1*ry)) && (field[x+(-1*rx)][y+(-1*ry)]=='*' || field[x+(-1*rx)][y+(-1*ry)]==colour))
     {strikeable=1;}
     
@@ -192,15 +192,25 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
 {
   int cs = 0;
   char *enemy = getEnemy(colour);
+  printf("!!!!! Start Check Counterstrike !!!!!\n");
+  printf("input: x:%i y:%i, colour: %c\n", x,y,colour);
   
   //2*for zum durchgehen der 4 Richtungen
-  for(int rx=-1; rx==1; rx+=2)
+  
+  //for(int rx=-1; rx==1; rx+=2)
+  for(int rx = -1; rx < 2; rx = rx + 2)
   {
-    for(int ry=-1; ry==1; ry+=2)
+    printf("rx=%i\n",rx);
+    //for(int ry=-1; ry==1; ry+=2)
+    for(int ry = -1; ry < 2; ry = ry + 2)
     {
+      //printf("rx=%i, ry=%i\n",rx, ry);
+      //printf("Figur ist Bauer und teste ob schlagbarer Feind auf Distanz 1 ist");
+      //printf("Feld [x+rx][y+ry] = %c und das dahinter was frei sein muss [x+(rx*2)][y+(ry*2)]: %c ", field[x+rx][y+ry], field[x+(rx*2)][y+(ry*2)]);
       //Figur ist Bauer und schlagbarer Feind auf Distanz 1
-      if((colour=='b' || colour == 'w') && (field[x+rx][y+ry]==enemy[0] || (field[x+rx][y+ry]==enemy[1])) && (field[x+(rx*2)][y+(ry*2)]=='*'))
+      if((inBound(x+rx,y+ry) && inBound(x+(rx*2),y+(ry*2))) && (colour=='b' || colour == 'w') && (field[x+rx][y+ry]==enemy[0] || (field[x+rx][y+ry]==enemy[1])) && (field[x+(rx*2)][y+(ry*2)]=='*'))
       {
+        //printf("Schlagbarer Feind auf 1 counterstrikable");
         cs = 1;
       }
       //Figur ist eine Dame
@@ -235,7 +245,7 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
 
 //berechnet die Gewichtung für die Position(x,y) auf die man ziehen will und gibt diese zurück
 // x,y der Position, das aktuelle Feld, Farbe des aktuell ziehenden Steins (wichtig, ob Dame oder Bauer!)
-int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/)
+int getWeight(int x, int y, char field[8][8], char colour, int xakt, int yakt)
 {
   printf("################ getWeight START ################\nInput x:%i y:%i Farbe: %c\n", x,y,colour);
   /*char* buffer = malloc(sizeof(char)*3);
@@ -253,7 +263,7 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   int strike = -100;
   int lastRow = -20;
   int crown = 50;
-  int counterStrike = 100;
+  int counterStrike = 10000;
 
   int gewichtung = 0;
   //char* enemy [2];
@@ -264,21 +274,29 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   
   
   printf("checkEnemy+strikeable\n");
+  printf("test");
+  printf("(checkEnemy(1,1,x,y,field,colour) = %i\n", (checkEnemy(1,1,x,y,field,colour)));
+  printf("(checkEnemy(1,-1,x,y,field,colour) = %i\n", (checkEnemy(1,-1,x,y,field,colour)));
+  printf("(checkEnemy(-1,1,x,y,field,colour) = %i\n", (checkEnemy(-1,1,x,y,field,colour)));
+  printf("(checkEnemy(-1,-1,x,y,field,colour) = %i\n", (checkEnemy(-1,-1,x,y,field,colour)));
+  
   //alle vier Richtungen
-  for(int rx=-1; rx==1; rx+=2)
+  for(int rx = -1; rx < 2; rx = rx + 2)
   {
-    for(int ry=-1; ry==1; ry+=2)
+    for(int ry = -1; ry < 2; ry = ry + 2)
     {
+      //printf("aktuelle Richtung rx:%i ry:%i\n",rx,ry);
       if(inBound(x,y))
       {
+        //printf("aktuelle Richtung rx:%i ry:%i\n",rx,ry);
         //Feind ja
         if(checkEnemy(rx,ry,x,y,field,colour))
         {
           //schlagbar ja -> Abwertung
           if(strikeable(rx,ry,x,y,field,colour))
           {
-            printf("Strikeable = true abzug von %i aktuelle Gewichtung %i\n", strike, gewichtung);
             gewichtung+=strike;
+            printf("Strikeable = true abzug von %i aktuelle Gewichtung %i\n", strike, gewichtung);
           }
           else
           {
@@ -295,40 +313,11 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
         {break;}
     }
   }
-/*  
-  printf("rechts oben\n");
-  //rechts oben
-  if(checkEnemy(1,1,x,y,field,colour))
-  {
-    if(strikeable(1,1,x,y,field,colour))
-    {
-      gewichtung+=strike;
-    }
-    else if (checkCounterstrike(x,y,field,colour))
-    { gewichtung+= counterStrike; }
-  }
-  printf("links unten\n");
-  // links unten
-  if(checkEnemy(-1,-1,x,y,field,colour))
-  {
-    if(strikeable(-1,-1,x,y,field,colour))
-    {
-      gewichtung+=strike;
-    }
-  }
-  printf("rechts unten\n");
-  //rechts unten
-  if(checkEnemy(1,-1,x,y,field,colour))
-  {
-    if(strikeable(1,-1,x,y,field,colour))
-    {
-      gewichtung+=strike;
-    }
-  }
-*/
+
 
   // Abwertung bei verlassen der letzten Reihe
-  //???? aktuell nur für Bauern! (weiß nicht ob auch für Dame sinnvoll)
+  // aktuell nur für Bauern! (weiß nicht ob auch für Dame sinnvoll)
+  //printf("check lastRow\n");
   if(colour=='b'||colour=='B')
   {
     if( y == 7 && colour =='b')
@@ -347,14 +336,15 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
   }
 
   // Aufwertung, wenn Bauer gekrönt wird
+  printf("Check Krönung\n");
   if(colour=='b' && y==0)
   {
-    printf("crown bonus von %i aktuelle Gewichtung %i", crown, gewichtung);
+    printf("crown bonus von %i aktuelle Gewichtung %i\n", crown, gewichtung);
     gewichtung+=crown;
   }
   else if(colour=='w'&& y==7)
   {
-    printf("crown bonus von %i aktuelle Gewichtung %i", crown, gewichtung);
+    printf("crown bonus von %i aktuelle Gewichtung %i\n", crown, gewichtung);
     gewichtung+=crown;
   }
 
@@ -370,16 +360,17 @@ int getWeight(int x, int y, char field[8][8], char colour/*,int xakt, int yakt*/
 
 
   // Abwertung, wenn man einen befreundeten Stein schlagbar macht!
-  if( (inBound(x+1,y+1) && (field[x+1][y+1] == ownColour[0] || field[x+1][y+1] == ownColour[1]) && checkEnemy(1,1,x+1,y+1,field,colour)) ||
-      (inBound(x+1,y-1) && (field[x+1][y-1] == ownColour[0] || field[x+1][y-1] == ownColour[1]) && checkEnemy(1,-1,x+1,y-1,field,colour)) ||
-      (inBound(x-1,y+1) && (field[x-1][y+1] == ownColour[0] || field[x-1][y+1] == ownColour[1]) && checkEnemy(-1,1,x-1,y+1,field,colour)) ||
-      (inBound(x-1,y-1) && (field[x-1][y-1] == ownColour[0] || field[x-1][y-1] == ownColour[1]) && checkEnemy(-1,-1,x-1,y-1,field,colour)) )
+  if( (inBound(xakt+1,yakt+1) && (field[xakt+1][yakt+1] == ownColour[0] || field[xakt+1][yakt+1] == ownColour[1]) && checkEnemy(1,1,xakt+1,yakt+1,field,colour)) ||
+      (inBound(xakt+1,yakt-1) && (field[xakt+1][yakt-1] == ownColour[0] || field[xakt+1][yakt-1] == ownColour[1]) && checkEnemy(1,-1,xakt+1,yakt-1,field,colour)) ||
+      (inBound(xakt-1,yakt+1) && (field[xakt-1][yakt+1] == ownColour[0] || field[xakt-1][yakt+1] == ownColour[1]) && checkEnemy(-1,1,xakt-1,yakt+1,field,colour)) ||
+      (inBound(xakt-1,yakt-1) && (field[xakt-1][yakt-1] == ownColour[0] || field[xakt-1][yakt-1] == ownColour[1]) && checkEnemy(-1,-1,xakt-1,yakt-1,field,colour)) )
+
   {
-    printf("Abwertung, weil befreundeter Stein schlagbar wird %i\n aktuelle Gewichtung: %i", strike, gewichtung);
+    printf("Abwertung um %i, weil befreundeter Stein schlagbar wird, aktuelle Gewichtung: %i\n", strike, gewichtung);
     gewichtung+=strike;
   }
   
-  printf("Berechnete Gewichtung für Position %i:%i - %i\n", (x), (y), gewichtung);
+  printf("Berechnete Gewichtung für Position %i:%i = %i\n", (x), (y), gewichtung);
   printf("################ ENDE GET WEIGHT ################\n");
   free(enemy);
   free(ownColour);
@@ -431,7 +422,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry, buffer));
                     strcat(strike.moveATM, ":");
                     strcpy(strike.bestMove.zug,strike.moveATM);
-                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 1000;
+                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 10000;
                     strike.field[strike.x][strike.y]      = '*';
                     strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
@@ -502,7 +493,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
     //temporäre Wertung mit unmöglich niedrigem Wert befüllt
-    int gewichtungTemp = -500;
+    int gewichtungTemp = -1000;
     for(int distance = 1; distance<8; distance++)
     {
       //ist das angegeben Feld noch auf dem Board? && ist es leer? -> Abbruch bei nein
@@ -510,7 +501,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
       {
         //berechne gewichtung für das Feld
         //printf("Berechne Gewichtung für das Feld [%i][%i] mit Inhalt %c\n",strike.x+(distance*rx),strike.y+(distance*ry), strike.field[strike.x+(distance*rx)][strike.y+(distance*ry)]);
-        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y]); //+ queenMoveDowngrade;
+        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y], strike.x, strike.y)+1000; //+ queenMoveDowngrade;
         //checke, ob das Feld/der Move besser ist
         if(strike.bestMove.gewichtung<gewichtungTemp)
         {
@@ -617,8 +608,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -500;
-    tempMove.gewichtung = -500;
+    currentMove.gewichtung = -5000;
+    tempMove.gewichtung = -5000;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
@@ -633,13 +624,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'w') {
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*' && geschlagen != -1)){
       //nach links oben schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
       currentField[x-1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesWhite(x-2, y+2, tempMove, 1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-2, y+2, currentField, 'w');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-2, y+2, currentField, 'w', x, y);
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -659,13 +650,13 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*' && geschlagen != -1)){
       //nach rechts oben schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesWhite(x+2, y+2, tempMove, 1 , moveBisherRechts, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y+2, currentField, 'w');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y+2, currentField, 'w', x, y);
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -686,14 +677,15 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     
     if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
-      tempMove.gewichtung = tempMove.gewichtung + 200;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x-1][y+1]  = 'w';
       tempMove = possibleMovesWhite(x-1, y+1, tempMove, -1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y+1, currentField, 'w');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y+1, currentField, 'w', x, y);
       geschlagen = -1;
       //printf("moveBewegtLinks: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
+      printf("Vergleiche Gewichtung temp: %i und currentMove: %i\n", tempMove.gewichtung, currentMove.gewichtung);
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -710,11 +702,11 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     
     if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       //nach rechts oben bewegen
-      tempMove.gewichtung = tempMove.gewichtung + 200;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+1][y+1]  = 'w';
       tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y+1, currentField, 'w');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y+1, currentField, 'w', x, y);
       geschlagen = -1;
       //printf("moveBewegtRechts: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
@@ -748,8 +740,9 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     free(moveBisherRechts);
     free(ergebnis);
     free(buffer);
-    //printf("momentaner Zug: %s", currentMove.zug);
-    //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
+    printf("momentaner Zug: %s", currentMove.zug);
+    printf("mit der Gewichtung: %d\n", currentMove.gewichtung);
+    printf("Bester Zug: %s mit der Gewichtung: %i\n", bestMove.zug, bestMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
       return currentMove;
     } else {
@@ -771,8 +764,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -500;
-    tempMove.gewichtung = -500;
+    currentMove.gewichtung = -5000;
+    tempMove.gewichtung = -5000;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
@@ -790,13 +783,13 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*' && geschlagen != -1)){
       //nach links unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesBlack(x-2, y-2, tempMove, 1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-2, y-2, currentField, 'b');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-2, y-2, currentField, 'b', x, y);
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -816,13 +809,13 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*' && geschlagen != -1)){
       //nach rechts unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
       //rekursiver Aufruf mit temporären Feld
       tempMove = possibleMovesBlack(x+2, y-2, tempMove, 1 , moveBisherRechts, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y-2, currentField, 'b');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+2, y-2, currentField, 'b', x, y);
       geschlagen = 1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
       if(tempMove.gewichtung > currentMove.gewichtung){
@@ -843,10 +836,10 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //nach links unten bewegen
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
-      tempMove.gewichtung = tempMove.gewichtung + 200;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b', x, y);
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -868,10 +861,10 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //nach rechts unten bewegen
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
-      tempMove.gewichtung = tempMove.gewichtung + 200;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       //printf("moveBewegtRechts: %s\n", moveBisher);
       tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
-      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b');
+      tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b', x, y);
       geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
@@ -905,8 +898,9 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     free(moveBisherRechts);
     free(ergebnis);
     free(buffer);
-    //printf("momentaner Zug: %s", currentMove.zug);
-    //printf("mit der Gewichtung: %d\n\n", currentMove.gewichtung);
+    printf("momentaner Zug: %s", currentMove.zug);
+    printf("mit der Gewichtung: %d\n", currentMove.gewichtung);
+    printf("Bester Zug: %s mit der Gewichtung: %i\n", bestMove.zug, bestMove.gewichtung);
     if (currentMove.gewichtung > bestMove.gewichtung){
       return currentMove;
     } else {
@@ -925,11 +919,12 @@ char* think() {
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");
-  spielzug.gewichtung = -500;
+  spielzug.gewichtung = -5000;
 
   char currentField[8][8];
   memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
   char spielStein;
+  char* buffer = malloc(sizeof(char)*3);
 
   switch (spieldaten->playerNumber) {
     case 0:     //weiß
@@ -937,6 +932,7 @@ char* think() {
         for (int x=0; x<8; x++) {
           spielStein = spieldaten->field[x][y];
           if (spielStein == 'w' || spielStein == 'W') {
+            printf("Spielstein: %c Pos:%s\n", spielStein, getCoordinate(x,y,buffer));
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
             spielzug = possibleMovesWhite(x,y, spielzug, 0, moveBisher, currentField);
@@ -952,6 +948,7 @@ char* think() {
           spielStein = spieldaten->field[x][y];
           //printf("Spielstein: %c\n", spielStein);
           if (spielStein == 'b' || spielStein == 'B') {
+            printf("Spielstein: %c Pos:%s\n", spielStein, getCoordinate(x,y,buffer));
             char* moveBisher  = malloc(sizeof(char)*64);
             strcpy(moveBisher, "");
             spielzug = possibleMovesBlack(x,y, spielzug, 0, moveBisher, currentField);
@@ -966,5 +963,6 @@ char* think() {
   strcpy(ergebnis, spielzug.zug);
   printf("thinker sagt%s \n", ergebnis);
   shmdt(spieldaten);
+  free(buffer);
   return ergebnis;
 }
