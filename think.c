@@ -389,6 +389,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
+    int flag = 1;
     //printf("Starte queenStrike\n");
     struct queenData temp;
     //temp.bestMove.gewichtung = -666666;
@@ -398,7 +399,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
     printf("\nInput: rx=%i ry=%i strike.x=%i strike.y=%i\n\n", rx, ry, strike.x, strike.y);
 
 
-    for (int distance = 1; distance<8; distance ++){
+    for (int distance = 1; distance<8 && flag; distance ++){
         //printf("Forschleifenr. %i\n", distance);
         int xnew = strike.x+(distance*rx);
         int ynew = strike.y+(distance*ry);
@@ -418,6 +419,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
             //ist das zu schlagende Feld ein gegnerisches, dahinter frei und das Feld davor frei oder die eigene Figur
             if((strike.field[xnew][ynew] == strike.enemyColour[0] || strike.field[xnew][ynew] == strike.enemyColour[1]) && strike.field[xnew+rx][ynew+ry] == '*' && (strike.field[xnew-rx][ynew-ry] == strike.ownColour || strike.field[xnew-rx][ynew-ry] == '*'))
                 {
+                    flag = 0;
                     //printf("Schlag gefunden in Schleifenr. %i\n", distance);
                     strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry, buffer));
                     strcat(strike.moveATM, ":");
@@ -466,21 +468,6 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                         strike=temp;
                     }
 
-                }
-                else
-                {
-                  int flag = 0;
-
-                  for(int back = distance; distance > 0; distance = distance -1)
-                  {
-                    if(strike.field[xnew-back][ynew-back] == strike.enemyColour[0] || strike.field[xnew-back][ynew-back] == strike.enemyColour[1])
-                    {
-                      flag = 1;
-                      break;
-                    }
-                  }
-                  if(flag)
-                    { break; }
                 }
                   
 
