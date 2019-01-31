@@ -263,7 +263,7 @@ int getWeight(int x, int y, char field[8][8], char colour, int xakt, int yakt)
   int strike = -100;
   int lastRow = -20;
   int crown = 50;
-  int counterStrike = 10000;
+  int counterStrike = 100;
 
   int gewichtung = 0;
   //char* enemy [2];
