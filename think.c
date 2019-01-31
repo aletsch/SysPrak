@@ -493,7 +493,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
     //buffer für Koordinaten
     char* buffer = malloc(sizeof(char)*3);
     //temporäre Wertung mit unmöglich niedrigem Wert befüllt
-    int gewichtungTemp = -1000;
+    int gewichtungTemp = -500;
     for(int distance = 1; distance<8; distance++)
     {
       //ist das angegeben Feld noch auf dem Board? && ist es leer? -> Abbruch bei nein
@@ -608,8 +608,8 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -5000;
-    tempMove.gewichtung = -5000;
+    currentMove.gewichtung = -500;
+    tempMove.gewichtung = -500;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
@@ -764,8 +764,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
     currentMove.gewichtung = bestMove.gewichtung;
     tempMove.gewichtung = bestMove.gewichtung;
   } else {
-    currentMove.gewichtung = -5000;
-    tempMove.gewichtung = -5000;
+    currentMove.gewichtung = -500;
+    tempMove.gewichtung = -500;
   }
 
   strcat(moveBisher, getCoordinate(x,y, buffer));         //concate move
