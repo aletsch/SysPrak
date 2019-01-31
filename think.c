@@ -677,7 +677,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     
     if (inBound(x-1, y+1) && (currentField[x-1][y+1] == '*') && (geschlagen == 0)) {
       //nach links oben bewegen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       currentField[x][y]      = '*';
       currentField[x-1][y+1]  = 'w';
       tempMove = possibleMovesWhite(x-1, y+1, tempMove, -1 , moveBisher, currentField);
@@ -702,7 +702,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
     
     if (inBound(x+1, y+1) && (currentField[x+1][y+1] == '*') && (geschlagen == 0)) {
       //nach rechts oben bewegen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       currentField[x][y]      = '*';
       currentField[x+1][y+1]  = 'w';
       tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisher, currentField);
@@ -783,7 +783,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*' && geschlagen != -1)){
       //nach links unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
@@ -809,7 +809,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*' && geschlagen != -1)){
       //nach rechts unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
@@ -836,7 +836,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //nach links unten bewegen
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b', x, y);
@@ -861,7 +861,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       //nach rechts unten bewegen
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 200;
       //printf("moveBewegtRechts: %s\n", moveBisher);
       tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b', x, y);
