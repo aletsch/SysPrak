@@ -467,8 +467,12 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     }
 
                 }
+                else
+                  {break;}
 
             }
+            else
+              {break;}
 
 
     }
