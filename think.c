@@ -670,7 +670,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
       } else {
-        tempMove.gewichtung = -1;
+        tempMove.gewichtung = -500;
       }
     }
     
@@ -696,7 +696,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
       } else {
-        tempMove.gewichtung = -1;
+        tempMove.gewichtung = -500;
       }
     }
     
@@ -802,7 +802,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
       } else {
-        tempMove.gewichtung = -1;
+        tempMove.gewichtung = -500;
       }
     }
 
@@ -827,7 +827,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
       } else {
-        tempMove.gewichtung = -1;
+        tempMove.gewichtung = -500;
       }
     }
 
@@ -853,7 +853,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       if(geschlagen){
         tempMove.gewichtung = bestMove.gewichtung;
       } else {
-        tempMove.gewichtung = -1;
+        tempMove.gewichtung = -500;
       }
     }
     
