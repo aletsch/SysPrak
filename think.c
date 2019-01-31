@@ -468,11 +468,24 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
 
                 }
                 else
-                  {break;}
+                {
+                  int flag = 0;
+                  for(int return = distance; distance > 0; distance = distance -1)
+                  {
+                    if(field[xnew-distance][ynew-distance] == enemy[0] || field[xnew-distance][ynew-distance] == enemy[1])
+                    {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if(flag)
+                    { break; }
+                }
+                  
 
             }
-            else
-              {break;}
+            //else
+              //{break;}
 
 
     }
