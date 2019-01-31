@@ -470,9 +470,9 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                 else
                 {
                   int flag = 0;
-                  for(int return = distance; distance > 0; distance = distance -1)
+                  for(int back = distance; distance < 0; distance = distance -1)
                   {
-                    if(field[xnew-distance][ynew-distance] == enemy[0] || field[xnew-distance][ynew-distance] == enemy[1])
+                    if(strike.field[xnew-back][ynew-back] == strike.enemyColour[0] || strike.field[xnew-back][ynew-back] == strike.enemyColour[1])
                     {
                       flag = 1;
                       break;
@@ -699,7 +699,6 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       currentField[x-1][y+1]  = 'w';
       tempMove = possibleMovesWhite(x-1, y+1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y+1, currentField, 'w', x, y);
-      geschlagen = -1;
       //printf("moveBewegtLinks: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
       printf("Vergleiche Gewichtung temp: %i und currentMove: %i\n", tempMove.gewichtung, currentMove.gewichtung);
@@ -722,14 +721,14 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
       tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+1][y+1]  = 'w';
-      tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisher, currentField);
+      tempMove = possibleMovesWhite(x+1, y+1, tempMove, -1 , moveBisherRechts, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y+1, currentField, 'w', x, y);
-      geschlagen = -1;
       //printf("moveBewegtRechts: %s\n", moveBisher);
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
+        strcpy(moveBisher, moveBisherRechts);
      }
     }
 
@@ -854,11 +853,8 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x-1][y-1]  = 'b';
       tempMove.gewichtung = tempMove.gewichtung + 1000;
-      //printf("moveBewegtLinks: %s\n", moveBisher);
       tempMove = possibleMovesBlack(x-1, y-1, tempMove, -1 , moveBisher, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x-1, y-1, currentField, 'b', x, y);
-      geschlagen = -1;
-      //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
       if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
@@ -879,14 +875,13 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
       currentField[x][y]      = '*';
       currentField[x+1][y-1]  = 'b';
       tempMove.gewichtung = tempMove.gewichtung + 1000;
-      //printf("moveBewegtRechts: %s\n", moveBisher);
-      tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisher, currentField);
+      tempMove = possibleMovesBlack(x+1, y-1, tempMove, -1 , moveBisherRechts, currentField);
       tempMove.gewichtung = tempMove.gewichtung + getWeight(x+1, y-1, currentField, 'b', x, y);
-      geschlagen = -1;
       //wenn der zurückgegebene Zug besser ist als der bisher beste Zug, currentMove ersetzen
 
      if(tempMove.gewichtung > currentMove.gewichtung){
         currentMove = tempMove;
+        strcpy(moveBisher, moveBisherRechts);
      }
     }
 
