@@ -800,7 +800,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*' && geschlagen != -1)){
       //nach links unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
@@ -826,7 +826,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*' && geschlagen != -1)){
       //nach rechts unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 1000;
+      tempMove.gewichtung = tempMove.gewichtung + 10000;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
