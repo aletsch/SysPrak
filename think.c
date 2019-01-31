@@ -422,7 +422,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                     strcat(strike.moveATM,getCoordinate(xnew+rx,ynew+ry, buffer));
                     strcat(strike.moveATM, ":");
                     strcpy(strike.bestMove.zug,strike.moveATM);
-                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 10000;
+                    strike.bestMove.gewichtung = strike.bestMove.gewichtung + 1000;
                     strike.field[strike.x][strike.y]      = '*';
                     strike.field[xnew+rx][ynew+ry]  = strike.ownColour;
                     strike.field[xnew][ynew]  = '*';
@@ -624,7 +624,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'w') {
     if (inBound(x-2, y+2) && (currentField[x-1][y+1] == 'b' || currentField[x-1][y+1] == 'B' ) && (currentField[x-2][y+2] == '*' && geschlagen != -1)){
       //nach links oben schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 10000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x-2][y+2]  = 'w';
       currentField[x-1][y+1]  = '*';
@@ -650,7 +650,7 @@ struct moeglicherZug possibleMovesWhite(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y+2) && (currentField[x+1][y+1] == 'b' || currentField[x+1][y+1] == 'B') && (currentField[x+2][y+2] == '*' && geschlagen != -1)){
       //nach rechts oben schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 10000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+2][y+2]  = 'w';
       currentField[x+1][y+1]  = '*';
@@ -783,7 +783,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
   if (currentField[x][y] == 'b') {
     if (inBound(x-2, y-2) && (currentField[x-1][y-1] == 'w' || currentField[x-1][y-1] == 'W' ) && (currentField[x-2][y-2] == '*' && geschlagen != -1)){
       //nach links unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 10000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x-2][y-2]  = 'b';
       currentField[x-1][y-1]  = '*';
@@ -809,7 +809,7 @@ struct moeglicherZug possibleMovesBlack(int x, int y, struct moeglicherZug bestM
 
     if (inBound(x+2, y-2) && (currentField[x+1][y-1] == 'w' || currentField[x+1][y-1] == 'W') && (currentField[x+2][y-2] == '*' && geschlagen != -1)){
       //nach rechts unten schlagen
-      tempMove.gewichtung = tempMove.gewichtung + 10000;
+      tempMove.gewichtung = tempMove.gewichtung + 1000;
       currentField[x][y]      = '*';
       currentField[x+2][y-2]  = 'b';
       currentField[x+1][y-1]  = '*';
@@ -919,7 +919,7 @@ char* think() {
 
   struct moeglicherZug spielzug;
   strcpy(spielzug.zug, "");
-  spielzug.gewichtung = -5000;
+  spielzug.gewichtung = -500;
 
   char currentField[8][8];
   memcpy(&currentField, spieldaten->field, sizeof(char)*8*8);
