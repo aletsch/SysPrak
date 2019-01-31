@@ -470,6 +470,7 @@ struct queenData queenStrike(int rx, int ry, struct queenData strike)
                 else
                 {
                   int flag = 0;
+
                   for(int back = distance; distance > 0; distance = distance -1)
                   {
                     if(strike.field[xnew-back][ynew-back] == strike.enemyColour[0] || strike.field[xnew-back][ynew-back] == strike.enemyColour[1])
