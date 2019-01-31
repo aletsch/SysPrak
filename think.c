@@ -501,7 +501,7 @@ struct queenData queenMove(int rx, int ry, struct queenData strike)
       {
         //berechne gewichtung für das Feld
         //printf("Berechne Gewichtung für das Feld [%i][%i] mit Inhalt %c\n",strike.x+(distance*rx),strike.y+(distance*ry), strike.field[strike.x+(distance*rx)][strike.y+(distance*ry)]);
-        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y], strike.x, strike.y)+1000; //+ queenMoveDowngrade;
+        gewichtungTemp = getWeight(strike.x+(distance*rx),strike.y+(distance*ry),strike.field,strike.field[strike.x][strike.y], strike.x, strike.y)+200; //+ queenMoveDowngrade;
         //checke, ob das Feld/der Move besser ist
         if(strike.bestMove.gewichtung<gewichtungTemp)
         {
