@@ -220,7 +220,7 @@ int checkCounterstrike(int x, int y, char field [8][8], char colour)
         for(int distance=1; distance<8; distance ++)
         {
           //ist das zu schlagende Feld und das dahinter noch auf dem Board?
-          if(inBound((x+(rx*distance)),(y+(ry*distance))) && inBound((x+(rx*distance)+ry),(y+(ry*distance)+ry)))
+          if(inBound((x+(rx*distance)),(y+(ry*distance))) && inBound((x+(rx*distance)+rx),(y+(ry*distance)+ry)))
           {
             //wenn das Feld leer ist tu nichts und untersuche das nächste
             if(field[x+(rx*distance)][y+(ry*distance)]=='*')
